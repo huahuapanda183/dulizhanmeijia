@@ -31,6 +31,8 @@ export interface Product {
   comparePrice?: string;
   rating?: string;
   image: string;
+  /** second image shown on hover */
+  hoverImage?: string;
   href: string;
   badge?: "NEW" | "BESTSELLER" | string;
   /** corner sale ribbon text, e.g. "30% OFF" */
