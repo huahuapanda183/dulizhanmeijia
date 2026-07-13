@@ -1,41 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
-import type { HeroSlide } from "@/types";
-
-const SLIDES: HeroSlide[] = [
-  {
-    desktop: "2026_07_FreeUSShipping_HP_Desktop_copy.webp",
-    mobile: "2026_07_FreeUSShipping_HP_Mobile_copy.webp",
-    alt: "Score free U.S. economy shipping",
-    href: "/collections/all",
-  },
-  {
-    desktop: "2026_06_GlamIcons_HP_Desktop_1.webp",
-    mobile: "2026_06_GlamIcons_HP_Mobile_3.webp",
-    alt: "Glam Icons collection",
-    href: "/collections/glam-icons",
-  },
-  {
-    desktop: "2026_06_Glamzilla_HP_Desktop.webp",
-    mobile: "2026_06_Glamzilla_HP_Mobile.webp",
-    alt: "Glamnetic x Glamzilla",
-    href: "/collections/glamzilla",
-  },
-  {
-    desktop: "2026_06_SandalSeason_HP_Desktop.webp",
-    mobile: "2026_06_SandalSeason_HP_Mobile.webp",
-    alt: "Sandal season collection",
-    href: "/collections/sandal-season",
-  },
-  {
-    desktop: "2026_07_SparklingGems_HP_DesktopGeneral.webp",
-    mobile: "2026_07_SparklingGems_HP_MobileGeneral.webp",
-    alt: "Sparkling gems collection",
-    href: "/collections/sparkling-gems",
-  },
-];
+import { HERO_SLIDES as SLIDES } from "@/lib/data/content";
 
 export function HeroSlideshow() {
   const [i, setI] = useState(0);
@@ -49,7 +17,7 @@ export function HeroSlideshow() {
     <section aria-label="Featured" className="relative w-full overflow-hidden bg-cream">
       <div className="relative">
         {SLIDES.map((slide, idx) => (
-          <a
+          <Link
             key={slide.desktop}
             href={slide.href}
             aria-hidden={idx !== i}
@@ -72,7 +40,7 @@ export function HeroSlideshow() {
               alt={slide.alt}
               className="block h-auto w-full md:hidden"
             />
-          </a>
+          </Link>
         ))}
       </div>
 

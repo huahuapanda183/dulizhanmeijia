@@ -1,22 +1,35 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { StarIcon } from "@/components/icons";
-import type { Product } from "@/types";
+import { AddToBagButton } from "@/components/AddToBagButton";
+import { formatPrice } from "@/lib/format";
+import type { Product } from "@/lib/data/types";
 
 /**
- * Glamnetic product card used in the Best Sellers and Shop All rails.
+ * Product card used in the Best Sellers / Shop All / collection rails and grids.
  * Static + CSS hover (primary image swaps to hover image on card hover).
  */
-export function ProductCard({ product }: { product: Product }) {
-  const onSale = Boolean(product.comparePrice);
+export function ProductCard({
+  product,
+  className,
+  layout = "rail",
+}: {
+  product: Product;
+  className?: string;
+  layout?: "rail" | "grid";
+}) {
+  const onSale = typeof product.compareAtPrice === "number";
+  const href = `/products/${product.handle}`;
+  const width =
+    layout === "grid" ? "w-full" : "w-[70vw] shrink-0 snap-start sm:w-[300px] md:w-[320px]";
   return (
-    <article className="group/card w-[70vw] shrink-0 snap-start sm:w-[300px] md:w-[320px]">
-      <Link href={product.href} className="block">
+    <article className={cn("group/card", width, className)}>
+      <Link href={href} className="block">
         <div className="relative aspect-square overflow-hidden rounded-sm bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`/images/${product.image}`}
-            alt={product.name}
+            src={`/images/${product.images[0]}`}
+            alt={product.title}
             className={cn(
               "h-full w-full object-cover transition-opacity duration-500",
               product.hoverImage && "group-hover/card:opacity-0",
@@ -40,32 +53,34 @@ export function ProductCard({ product }: { product: Product }) {
             </span>
           )}
 
-          {product.rating && (
+          {product.rating > 0 && (
             <span className="absolute right-3 top-3 flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-xs font-medium text-ink shadow-sm">
               <StarIcon className="h-3 w-3 text-mauve" />
-              {product.rating}
+              {product.rating.toFixed(1)}
             </span>
           )}
         </div>
 
         <div className="mt-3 text-center">
-          <h3 className="text-[19px] font-medium text-ink">{product.name}</h3>
+          <h3 className="text-[19px] font-medium text-ink">{product.title}</h3>
           <p className="mt-0.5 text-[15px] text-body">{product.shape}</p>
           <p className="mt-1 text-[15px]">
             {onSale && (
-              <span className="mr-2 text-body line-through">{product.comparePrice}</span>
+              <span className="mr-2 text-body line-through">
+                {formatPrice(product.compareAtPrice!, product.currency)}
+              </span>
             )}
-            <span className={cn(onSale ? "text-mauve" : "text-ink")}>{product.price}</span>
+            <span className={cn(onSale ? "text-mauve" : "text-ink")}>
+              {formatPrice(product.price, product.currency)}
+            </span>
           </p>
         </div>
       </Link>
 
-      <button
-        type="button"
+      <AddToBagButton
+        product={product}
         className="mt-3 w-full text-center text-[15px] font-medium uppercase tracking-[0.14em] text-ink underline decoration-1 underline-offset-4 transition-colors hover:text-mauve"
-      >
-        Add to Bag
-      </button>
+      />
     </article>
   );
 }

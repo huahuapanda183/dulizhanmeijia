@@ -2,12 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
-
-const MESSAGES = [
-  "FREE SHIPPING IN THE US + CANADA ON ORDERS $65+ USD",
-  "SCORE FREE U.S. ECONOMY SHIPPING — USE CODE: FREESHIP",
-  "BUY MORE, SAVE MORE — BUILD YOUR OWN BUNDLE",
-];
+import { ANNOUNCEMENTS as MESSAGES } from "@/lib/data/content";
 
 function useCountdown() {
   const [label, setLabel] = useState("");

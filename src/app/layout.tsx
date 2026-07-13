@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Sofia_Sans } from "next/font/google";
 import "./globals.css";
+import { CartProvider } from "@/lib/cart/cart-context";
+import { UIProvider } from "@/lib/ui/ui-context";
+import { CartDrawer } from "@/components/CartDrawer";
+import { SearchOverlay } from "@/components/SearchOverlay";
 
 const sofia = Sofia_Sans({
   variable: "--font-sofia",
@@ -23,7 +27,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sofia.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-cream text-ink">
-        {children}
+        <CartProvider>
+          <UIProvider>
+            {children}
+            <CartDrawer />
+            <SearchOverlay />
+          </UIProvider>
+        </CartProvider>
       </body>
     </html>
   );
