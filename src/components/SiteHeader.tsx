@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import {
   MenuIcon,
   UserIcon,
@@ -34,13 +35,13 @@ export function SiteHeader() {
             onClick={() => setOpen((v) => !v)}
             className="text-ink"
           >
-            {open ? <MenuIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
+            {open ? <CloseIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
           </button>
         </div>
 
-        <a href="/" aria-label="Glamnetic home" className="justify-self-center">
+        <Link href="/" aria-label="Glamnetic home" className="justify-self-center">
           <GlamneticLogo className="text-[26px] text-ink md:text-[30px]" />
-        </a>
+        </Link>
 
         <div className="flex items-center justify-end gap-4 md:gap-5 text-ink">
           <button type="button" aria-label="Account" className="hidden sm:block">
