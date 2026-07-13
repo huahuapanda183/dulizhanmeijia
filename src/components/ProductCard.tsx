@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { StarIcon } from "@/components/icons";
 import type { Product } from "@/types";
@@ -10,7 +11,7 @@ export function ProductCard({ product }: { product: Product }) {
   const onSale = Boolean(product.comparePrice);
   return (
     <article className="group/card w-[70vw] shrink-0 snap-start sm:w-[300px] md:w-[320px]">
-      <a href={product.href} className="block">
+      <Link href={product.href} className="block">
         <div className="relative aspect-square overflow-hidden rounded-sm bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -57,7 +58,7 @@ export function ProductCard({ product }: { product: Product }) {
             <span className={cn(onSale ? "text-mauve" : "text-ink")}>{product.price}</span>
           </p>
         </div>
-      </a>
+      </Link>
 
       <button
         type="button"

@@ -93,6 +93,78 @@ export function CloseIcon(props: IconProps) {
   );
 }
 
+export function MinusIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden {...props}>
+      <path d="M5 12h14" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function PlusIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} aria-hidden {...props}>
+      <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function ClockIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3.5 2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function CalendarIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden {...props}>
+      <rect x="3.5" y="5" width="17" height="16" rx="2" />
+      <path d="M3.5 9h17M8 3v4M16 3v4" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function SalonIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden {...props}>
+      <path d="M9 21h6M12 21V9" strokeLinecap="round" />
+      <path d="M8 9c0-3 1.8-6 4-6s4 3 4 6c0 1.1-.9 2-2 2h-4c-1.1 0-2-.9-2-2Z" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+export function BunnyIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.3} aria-hidden {...props}>
+      <path d="M7 13c-1.5-1-2.5-3-2-6 .2-1 1-1.2 1.6-.5C8 8 9 9.5 9.5 11" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M13 11c.5-1.5 1.5-3 2.9-4.5.6-.7 1.4-.5 1.6.5.5 3-.5 5-2 6" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M7 13c-1.2.8-2 2.2-2 3.7C5 19 7 21 12 21s7-2 7-4.3c0-1.5-.8-2.9-2-3.7-1-.7-2.5-1-5-1s-4 .3-5 1Z" strokeLinejoin="round" />
+      <circle cx="10" cy="17" r=".5" fill="currentColor" />
+      <circle cx="14" cy="17" r=".5" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function StarHalfIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden {...props}>
+      <defs>
+        <linearGradient id="half">
+          <stop offset="50%" stopColor="currentColor" />
+          <stop offset="50%" stopColor="currentColor" stopOpacity="0.25" />
+        </linearGradient>
+      </defs>
+      <path
+        fill="url(#half)"
+        d="m12 2 2.9 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14l-5-4.87 7.1-1.01L12 2Z"
+      />
+    </svg>
+  );
+}
+
 export function VerifiedIcon(props: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden {...props}>
