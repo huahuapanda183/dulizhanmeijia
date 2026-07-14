@@ -2,11 +2,14 @@ import Link from "next/link";
 import { getProducts, getCollections } from "@/lib/api";
 import { formatPrice, formatCount } from "@/lib/format";
 import { AnalyticsOverview } from "@/components/admin/AnalyticsOverview";
+import { T } from "@/lib/i18n/i18n-context";
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-line bg-white p-5">
-      <div className="text-[12px] uppercase tracking-wide text-body">{label}</div>
+      <div className="text-[12px] uppercase tracking-wide text-body">
+        <T k={label} />
+      </div>
       <div className="mt-2 text-[28px] font-semibold leading-none text-ink">{value}</div>
     </div>
   );
@@ -28,10 +31,10 @@ export default async function AdminDashboardPage() {
   return (
     <div>
       <header className="mb-6">
-        <h1 className="text-[26px] font-semibold text-ink">Dashboard</h1>
+        <h1 className="text-[26px] font-semibold text-ink"><T k="Dashboard" /></h1>
         <p className="mt-1 text-[14px] text-body">
-          Overview of your store — {formatCount(totalProducts)} products across{" "}
-          {formatCount(totalCollections)} collections.
+          <T k="Overview of your store" /> — {formatCount(totalProducts)} <T k="products" /> /{" "}
+          {formatCount(totalCollections)} <T k="collections" />
         </p>
       </header>
 
@@ -50,20 +53,20 @@ export default async function AdminDashboardPage() {
       {/* Recent products */}
       <section className="mt-8 rounded-md border border-line bg-white">
         <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-          <h2 className="text-[16px] font-semibold text-ink">Recent Products</h2>
+          <h2 className="text-[16px] font-semibold text-ink"><T k="Recent Products" /></h2>
           <Link href="/admin/products" className="text-[13px] font-medium text-mauve hover:underline">
-            View all →
+            <T k="View all" /> →
           </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-[14px]">
             <thead>
               <tr className="text-body text-[12px] uppercase border-b border-line">
-                <th className="px-5 py-3 text-left font-medium">Image</th>
-                <th className="px-5 py-3 text-left font-medium">Product</th>
-                <th className="px-5 py-3 text-left font-medium">Price</th>
-                <th className="px-5 py-3 text-left font-medium">Rating</th>
-                <th className="px-5 py-3 text-left font-medium">Status</th>
+                <th className="px-5 py-3 text-left font-medium"><T k="Image" /></th>
+                <th className="px-5 py-3 text-left font-medium"><T k="Product" /></th>
+                <th className="px-5 py-3 text-left font-medium"><T k="Price" /></th>
+                <th className="px-5 py-3 text-left font-medium"><T k="Rating" /></th>
+                <th className="px-5 py-3 text-left font-medium"><T k="Status" /></th>
               </tr>
             </thead>
             <tbody>
@@ -91,16 +94,16 @@ export default async function AdminDashboardPage() {
                   </td>
                   <td className="px-5 py-3 text-body">
                     <span className="text-ink">{p.rating.toFixed(1)} ★</span>{" "}
-                    <span className="text-[12px]">({formatCount(p.reviewCount)} reviews)</span>
+                    <span className="text-[12px]">({formatCount(p.reviewCount)} <T k="reviews" />)</span>
                   </td>
                   <td className="px-5 py-3">
                     {p.available ? (
                       <span className="inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-[12px] font-medium text-green-700">
-                        Active
+                        <T k="Active" />
                       </span>
                     ) : (
                       <span className="inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-[12px] font-medium text-gray-500">
-                        Draft
+                        <T k="Draft" />
                       </span>
                     )}
                   </td>

@@ -3,8 +3,10 @@
 import { useMemo, useState } from "react";
 import type { Product } from "@/lib/data/types";
 import { formatPrice, formatCount } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 export function AdminProductsTable({ products }: { products: Product[] }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
 
   const filtered = useMemo(() => {
@@ -26,11 +28,11 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by title, handle, or shape…"
+          placeholder={t("Search by title, handle, or shape…")}
           className="w-full max-w-[320px] rounded-sm border border-line bg-white px-3 py-2 text-[14px] text-ink placeholder:text-body focus:border-mauve focus:outline-none"
         />
         <span className="text-[13px] text-body">
-          {formatCount(filtered.length)} of {formatCount(products.length)} products
+          {formatCount(filtered.length)} {t("of")} {formatCount(products.length)} {t("products")}
         </span>
       </div>
 
@@ -38,15 +40,15 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
         <table className="w-full text-[14px]">
           <thead>
             <tr className="text-body text-[12px] uppercase border-b border-line">
-              <th className="px-4 py-3 text-left font-medium">Image</th>
-              <th className="px-4 py-3 text-left font-medium">Product</th>
-              <th className="px-4 py-3 text-left font-medium">Shape</th>
-              <th className="px-4 py-3 text-left font-medium">Price</th>
-              <th className="px-4 py-3 text-left font-medium">Rating</th>
-              <th className="px-4 py-3 text-left font-medium">Reviews</th>
-              <th className="px-4 py-3 text-left font-medium">Collections</th>
-              <th className="px-4 py-3 text-left font-medium">Status</th>
-              <th className="px-4 py-3 text-right font-medium">Action</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Image")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Product")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Shape")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Price")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Rating")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Reviews")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Collections")}</th>
+              <th className="px-4 py-3 text-left font-medium">{t("Status")}</th>
+              <th className="px-4 py-3 text-right font-medium">{t("Action")}</th>
             </tr>
           </thead>
           <tbody>
@@ -64,7 +66,7 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
                   <div className="font-medium text-ink">{p.title}</div>
                   <div className="text-[12px] text-body">{p.handle}</div>
                 </td>
-                <td className="px-4 py-2.5 text-body">{p.shape}</td>
+                <td className="px-4 py-2.5 text-body">{t(p.shape)}</td>
                 <td className="px-4 py-2.5">
                   <span className="text-ink">{formatPrice(p.price, p.currency)}</span>
                   {p.compareAtPrice ? (
@@ -79,11 +81,11 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
                 <td className="px-4 py-2.5">
                   {p.available ? (
                     <span className="inline-block rounded-full bg-green-100 px-2.5 py-0.5 text-[12px] font-medium text-green-700">
-                      Active
+                      {t("Active")}
                     </span>
                   ) : (
                     <span className="inline-block rounded-full bg-gray-100 px-2.5 py-0.5 text-[12px] font-medium text-gray-500">
-                      Draft
+                      {t("Draft")}
                     </span>
                   )}
                 </td>
@@ -93,7 +95,7 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
                     onClick={() => alert("Editing is available once the backend is connected.")}
                     className="text-[13px] font-medium text-mauve hover:underline"
                   >
-                    Edit
+                    {t("Edit")}
                   </button>
                 </td>
               </tr>
@@ -101,7 +103,7 @@ export function AdminProductsTable({ products }: { products: Product[] }) {
             {filtered.length === 0 ? (
               <tr>
                 <td colSpan={9} className="px-4 py-10 text-center text-[14px] text-body">
-                  No products match “{query}”.
+                  {t("No products match")} “{query}”.
                 </td>
               </tr>
             ) : null}
