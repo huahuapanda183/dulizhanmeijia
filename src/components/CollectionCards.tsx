@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CarouselRail } from "@/components/CarouselRail";
 import { PROMO_CARDS } from "@/lib/data/content";
+import { T } from "@/lib/i18n/i18n-context";
 
 export function CollectionCards() {
   return (
@@ -22,7 +23,7 @@ export function CollectionCards() {
               />
               <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
               <span className="absolute bottom-5 left-6 right-6 text-[18px] font-semibold leading-tight text-white md:text-[22px]">
-                {card.label}
+                <T k={card.label} />
               </span>
             </Link>
           ))}

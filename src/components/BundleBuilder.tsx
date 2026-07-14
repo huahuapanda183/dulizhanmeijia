@@ -5,9 +5,11 @@ import { cn } from "@/lib/utils";
 import { MinusIcon, PlusIcon } from "@/components/icons";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
+import { useI18n } from "@/lib/i18n/i18n-context";
 import type { Product } from "@/lib/data/types";
 
 export function BundleBuilder({ products }: { products: Product[] }) {
+  const { t } = useI18n();
   const [selected, setSelected] = useState<Record<string, number>>({});
   const { addItem, openCart } = useCart();
 
@@ -69,7 +71,7 @@ export function BundleBuilder({ products }: { products: Product[] }) {
                   onClick={() => add(p.handle)}
                   className="mt-2 rounded-sm bg-mauve py-2 text-[13px] font-semibold uppercase tracking-[0.1em] text-white transition-colors hover:bg-mauve-dark"
                 >
-                  Add
+                  {t("Add")}
                 </button>
               ) : (
                 <div className="mt-2 flex items-center justify-center gap-3 rounded-sm border border-line py-1.5">
@@ -91,11 +93,11 @@ export function BundleBuilder({ products }: { products: Product[] }) {
       <div className="sticky bottom-0 z-10 mt-8 flex flex-col gap-3 border-t border-line bg-white/95 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col">
           <span className="text-[15px] text-ink">
-            {count} {count === 1 ? "item" : "items"} in bundle
+            {count} {t(count === 1 ? "item in bundle" : "items in bundle")}
           </span>
           {discountRate > 0 && (
             <span className="text-[13px] font-medium text-mauve">
-              You&apos;re saving {Math.round(discountRate * 100)}%
+              {t("You're saving")} {Math.round(discountRate * 100)}%
             </span>
           )}
         </div>
@@ -113,7 +115,7 @@ export function BundleBuilder({ products }: { products: Product[] }) {
               count === 0 && "cursor-not-allowed opacity-50",
             )}
           >
-            Add Bundle to Bag
+            {t("Add Bundle to Bag")}
           </button>
         </div>
       </div>

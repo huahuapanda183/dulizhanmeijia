@@ -4,8 +4,10 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { subscribe } from "@/lib/api";
 import { ChevronRightIcon } from "@/components/icons";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 export function NewsletterForm() {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [consent, setConsent] = useState(false);
@@ -31,7 +33,7 @@ export function NewsletterForm() {
       <div className="flex items-center border-b border-line">
         <input
           type="email"
-          placeholder="Your Email"
+          placeholder={t("Your Email")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full bg-transparent py-2 text-[14px] outline-none placeholder:text-body"
@@ -41,7 +43,7 @@ export function NewsletterForm() {
           disabled={pending}
           className="shrink-0 flex items-center gap-1 text-[13px] uppercase tracking-wide text-ink"
         >
-          Join Us
+          {t("Join Us")}
           <ChevronRightIcon className="h-3.5 w-3.5" />
         </button>
       </div>
@@ -49,7 +51,7 @@ export function NewsletterForm() {
       <div className="mt-5 flex items-center border-b border-line">
         <input
           type="tel"
-          placeholder="Your Phone"
+          placeholder={t("Your Phone")}
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           className="w-full bg-transparent py-2 text-[14px] outline-none placeholder:text-body"
@@ -59,7 +61,7 @@ export function NewsletterForm() {
           disabled={pending}
           className="shrink-0 flex items-center gap-1 text-[13px] uppercase tracking-wide text-ink"
         >
-          Join Us
+          {t("Join Us")}
           <ChevronRightIcon className="h-3.5 w-3.5" />
         </button>
       </div>

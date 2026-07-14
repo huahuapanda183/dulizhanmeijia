@@ -5,25 +5,27 @@ import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
 import { MinusIcon, PlusIcon, BagIcon } from "@/components/icons";
 import { FreeShippingBar } from "@/components/FreeShippingBar";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 export function CartContents() {
+  const { t } = useI18n();
   const { lines, subtotal, currency, updateQuantity, removeItem } = useCart();
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8">
       <h1 className="heading-track text-[30px] md:text-[36px] font-medium text-ink mb-8">
-        Your Bag
+        {t("Your Bag")}
       </h1>
 
       {lines.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center">
           <BagIcon className="h-14 w-14 text-ink" />
-          <p className="mt-4 text-[18px] text-ink">Your bag is empty</p>
+          <p className="mt-4 text-[18px] text-ink">{t("Your bag is empty")}</p>
           <Link
             href="/collections/all"
             className="mt-4 inline-block bg-mauve px-8 py-3.5 text-white uppercase tracking-[0.12em] text-[14px]"
           >
-            Shop All
+            {t("Shop All")}
           </Link>
         </div>
       ) : (
@@ -83,7 +85,7 @@ export function CartContents() {
                     onClick={() => removeItem(line.id)}
                     className="text-[13px] text-body underline"
                   >
-                    Remove
+                    {t("Remove")}
                   </button>
                 </div>
               </div>
@@ -92,29 +94,29 @@ export function CartContents() {
 
           {/* Order summary */}
           <aside className="rounded-md border border-line bg-white p-6 h-fit">
-            <h2 className="text-[18px] text-ink font-medium">Order Summary</h2>
+            <h2 className="text-[18px] text-ink font-medium">{t("Order Summary")}</h2>
 
             <div className="mt-5 flex items-center justify-between text-[15px] text-ink">
-              <span>Subtotal</span>
+              <span>{t("Subtotal")}</span>
               <span className="font-medium">{formatPrice(subtotal, currency)}</span>
             </div>
 
             <p className="mt-2 text-[13px] text-body">
-              Shipping &amp; taxes calculated at checkout
+              {t("Shipping & taxes calculated at checkout")}
             </p>
 
             <Link
               href="/checkout"
               className="mt-6 block w-full bg-ink-2 text-white text-center uppercase tracking-[0.12em] py-3.5 rounded-sm text-[14px]"
             >
-              Checkout
+              {t("Checkout")}
             </Link>
 
             <Link
               href="/collections/all"
               className="mt-4 block text-center text-[14px] text-body underline"
             >
-              Continue Shopping
+              {t("Continue Shopping")}
             </Link>
           </aside>
           </div>

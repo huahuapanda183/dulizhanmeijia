@@ -14,6 +14,7 @@ import { CollectionSort } from "@/components/CollectionSort";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
+import { T } from "@/lib/i18n/i18n-context";
 
 type SearchParamsRecord = Record<string, string | string[] | undefined>;
 
@@ -69,24 +70,24 @@ export default async function CollectionPage({ params, searchParams }: Params) {
         <div className="mx-auto max-w-[1500px] px-4 md:px-8">
           <nav className="text-[13px] text-body pt-6">
             <Link href="/" className="hover:text-ink">
-              Home
+              <T k="Home" />
             </Link>{" "}
-            / <span className="text-ink">{collection.title}</span>
+            / <span className="text-ink"><T k={collection.title} /></span>
           </nav>
 
           <div className="mt-4 mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <h1 className="heading-track text-[30px] md:text-[40px] font-medium text-ink">
-                {collection.title}
+                <T k={collection.title} />
               </h1>
               {collection.description && (
-                <p className="mt-2 text-[15px] text-body max-w-xl">{collection.description}</p>
+                <p className="mt-2 text-[15px] text-body max-w-xl"><T k={collection.description} /></p>
               )}
             </div>
             <div className="flex items-center gap-4">
               <CollectionSort current={sort || "featured"} />
               <span className="text-[13px] text-body">
-                {formatCount(products.length)} products
+                {formatCount(products.length)} <T k="products" />
               </span>
             </div>
           </div>
@@ -97,7 +98,7 @@ export default async function CollectionPage({ params, searchParams }: Params) {
             <div className="flex-1">
               {products.length === 0 ? (
                 <p className="py-24 text-center text-[15px] text-body">
-                  No products match your filters.
+                  <T k="No products match your filters." />
                 </p>
               ) : (
                 <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">

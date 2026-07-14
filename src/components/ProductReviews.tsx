@@ -3,6 +3,7 @@ import type { Review } from "@/lib/data/types";
 import { Stars } from "@/components/Stars";
 import { VerifiedIcon } from "@/components/icons";
 import { timeAgo, formatCount } from "@/lib/format";
+import { T } from "@/lib/i18n/i18n-context";
 
 /** Product detail reviews block: rating summary, distribution, and review cards. */
 export async function ProductReviews({ handle }: { handle: string }) {
@@ -12,14 +13,14 @@ export async function ProductReviews({ handle }: { handle: string }) {
   return (
     <section className="bg-cream text-ink">
       <h2 className="heading-track text-[26px] md:text-[32px] font-medium text-ink text-center">
-        Reviews
+        <T k="Reviews" />
       </h2>
 
       <div className="flex flex-col items-center gap-2 mt-6">
         <span className="text-[44px] font-medium text-ink">{summary.average.toFixed(1)}</span>
         <Stars rating={summary.average} />
         <span className="text-[14px] text-body">
-          Based on {formatCount(summary.count)} review(s)
+          <T k="Based on" /> {formatCount(summary.count)} <T k="review(s)" />
         </span>
 
         {summary.count > 0 && (
@@ -45,7 +46,7 @@ export async function ProductReviews({ handle }: { handle: string }) {
       <div className="mt-10">
         {reviews.length === 0 ? (
           <p className="text-center text-body">
-            No reviews yet — be the first to review this product.
+            <T k="No reviews yet — be the first to review this product." />
           </p>
         ) : (
           <div className="grid gap-5 md:grid-cols-2">
@@ -75,7 +76,7 @@ export async function ProductReviews({ handle }: { handle: string }) {
                       {r.author}
                       {r.verified && <VerifiedIcon className="h-4 w-4 text-mauve" />}
                     </span>
-                    <span className="text-[12px] text-body">Reviewing {r.productTitle}</span>
+                    <span className="text-[12px] text-body"><T k="Reviewing" /> {r.productTitle}</span>
                   </div>
                 </div>
               </article>
@@ -87,7 +88,7 @@ export async function ProductReviews({ handle }: { handle: string }) {
           href="#"
           className="mt-8 mx-auto block w-fit border border-ink text-ink uppercase tracking-[0.12em] text-[13px] px-8 py-3 rounded-sm hover:bg-ink hover:text-white transition-colors"
         >
-          Write a Review
+          <T k="Write a Review" />
         </a>
       </div>
     </section>

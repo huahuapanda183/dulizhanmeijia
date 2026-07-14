@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
 import { getShippingRates, applyPromoCode, createOrder } from "@/lib/api";
+import { useI18n } from "@/lib/i18n/i18n-context";
 import type { Address, PromoResult, ShippingRate } from "@/lib/data/types";
 
 const TAX_RATE = 0.0725;
@@ -42,6 +43,7 @@ const INITIAL_FORM: FormState = {
 
 export function CheckoutForm() {
   const router = useRouter();
+  const { t } = useI18n();
   const { lines, subtotal, currency, clear } = useCart();
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
@@ -140,76 +142,76 @@ export function CheckoutForm() {
 
   return (
     <div className="mx-auto max-w-[1100px] px-4 py-12 md:px-8">
-      <h1 className="heading-track mb-8 text-[30px] font-medium text-ink md:text-[36px]">Checkout</h1>
+      <h1 className="heading-track mb-8 text-[30px] font-medium text-ink md:text-[36px]">{t("Checkout")}</h1>
 
       {lines.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-center">
-          <p className="text-[18px] text-ink">Your bag is empty</p>
+          <p className="text-[18px] text-ink">{t("Your bag is empty")}</p>
           <Link
             href="/collections/all"
             className="mt-4 inline-block bg-mauve px-8 py-3.5 text-[14px] uppercase tracking-[0.12em] text-white"
           >
-            Shop All
+            {t("Shop All")}
           </Link>
         </div>
       ) : (
         <div className="grid gap-10 lg:grid-cols-[1fr_400px]">
           <form onSubmit={handleSubmit} className="min-w-0">
             <section>
-              <h2 className="text-[18px] font-medium text-ink">Contact</h2>
+              <h2 className="text-[18px] font-medium text-ink">{t("Contact")}</h2>
               <div className="mt-4">
-                <label htmlFor="email" className="mb-1.5 block text-[13px] text-body">Email</label>
+                <label htmlFor="email" className="mb-1.5 block text-[13px] text-body">{t("Email")}</label>
                 <input id="email" type="email" autoComplete="email" value={form.email} onChange={(e) => update("email", e.target.value)} className={inputClass} placeholder="you@example.com" />
               </div>
             </section>
 
             <section className="mt-10">
-              <h2 className="text-[18px] font-medium text-ink">Shipping address</h2>
+              <h2 className="text-[18px] font-medium text-ink">{t("Shipping address")}</h2>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="firstName" className="mb-1.5 block text-[13px] text-body">First name</label>
+                  <label htmlFor="firstName" className="mb-1.5 block text-[13px] text-body">{t("First name")}</label>
                   <input id="firstName" autoComplete="given-name" value={form.firstName} onChange={(e) => update("firstName", e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="lastName" className="mb-1.5 block text-[13px] text-body">Last name</label>
+                  <label htmlFor="lastName" className="mb-1.5 block text-[13px] text-body">{t("Last name")}</label>
                   <input id="lastName" autoComplete="family-name" value={form.lastName} onChange={(e) => update("lastName", e.target.value)} className={inputClass} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="line1" className="mb-1.5 block text-[13px] text-body">Address</label>
+                  <label htmlFor="line1" className="mb-1.5 block text-[13px] text-body">{t("Address")}</label>
                   <input id="line1" autoComplete="address-line1" value={form.line1} onChange={(e) => update("line1", e.target.value)} className={inputClass} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="line2" className="mb-1.5 block text-[13px] text-body">Apartment, suite, etc. (optional)</label>
+                  <label htmlFor="line2" className="mb-1.5 block text-[13px] text-body">{t("Apartment, suite, etc. (optional)")}</label>
                   <input id="line2" autoComplete="address-line2" value={form.line2} onChange={(e) => update("line2", e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="city" className="mb-1.5 block text-[13px] text-body">City</label>
+                  <label htmlFor="city" className="mb-1.5 block text-[13px] text-body">{t("City")}</label>
                   <input id="city" autoComplete="address-level2" value={form.city} onChange={(e) => update("city", e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="state" className="mb-1.5 block text-[13px] text-body">State / Province</label>
+                  <label htmlFor="state" className="mb-1.5 block text-[13px] text-body">{t("State / Province")}</label>
                   <input id="state" autoComplete="address-level1" value={form.state} onChange={(e) => update("state", e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="zip" className="mb-1.5 block text-[13px] text-body">ZIP / Postal code</label>
+                  <label htmlFor="zip" className="mb-1.5 block text-[13px] text-body">{t("ZIP / Postal code")}</label>
                   <input id="zip" autoComplete="postal-code" value={form.zip} onChange={(e) => update("zip", e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="country" className="mb-1.5 block text-[13px] text-body">Country</label>
+                  <label htmlFor="country" className="mb-1.5 block text-[13px] text-body">{t("Country")}</label>
                   <input id="country" autoComplete="country-name" value={form.country} onChange={(e) => update("country", e.target.value)} className={inputClass} />
                 </div>
                 <div className="sm:col-span-2">
-                  <label htmlFor="phone" className="mb-1.5 block text-[13px] text-body">Phone (optional)</label>
+                  <label htmlFor="phone" className="mb-1.5 block text-[13px] text-body">{t("Phone (optional)")}</label>
                   <input id="phone" type="tel" autoComplete="tel" value={form.phone} onChange={(e) => update("phone", e.target.value)} className={inputClass} />
                 </div>
               </div>
             </section>
 
             <section className="mt-10">
-              <h2 className="text-[18px] font-medium text-ink">Shipping method</h2>
+              <h2 className="text-[18px] font-medium text-ink">{t("Shipping method")}</h2>
               <div className="mt-4 space-y-3">
                 {rates.length === 0 ? (
-                  <p className="text-[14px] text-body">Loading shipping options…</p>
+                  <p className="text-[14px] text-body">{t("Loading shipping options…")}</p>
                 ) : (
                   rates.map((rate) => {
                     const active = rate.id === selectedRateId;
@@ -218,11 +220,11 @@ export function CheckoutForm() {
                         <span className="flex items-center gap-3">
                           <input type="radio" name="shippingRate" value={rate.id} checked={active} onChange={() => setSelectedRateId(rate.id)} className="accent-mauve" />
                           <span>
-                            <span className="block text-[14px] text-ink">{rate.label}</span>
-                            <span className="block text-[13px] text-body">{rate.estimate}</span>
+                            <span className="block text-[14px] text-ink">{t(rate.label)}</span>
+                            <span className="block text-[13px] text-body">{t(rate.estimate)}</span>
                           </span>
                         </span>
-                        <span className="text-[14px] font-medium text-ink">{rate.amount === 0 ? "FREE" : formatPrice(rate.amount, currency)}</span>
+                        <span className="text-[14px] font-medium text-ink">{rate.amount === 0 ? t("FREE") : formatPrice(rate.amount, currency)}</span>
                       </label>
                     );
                   })
@@ -231,19 +233,19 @@ export function CheckoutForm() {
             </section>
 
             <section className="mt-10">
-              <h2 className="text-[18px] font-medium text-ink">Payment</h2>
-              <p className="mt-2 text-[13px] text-body">Demo checkout — no real payment is processed.</p>
+              <h2 className="text-[18px] font-medium text-ink">{t("Payment")}</h2>
+              <p className="mt-2 text-[13px] text-body">{t("Demo checkout — no real payment is processed.")}</p>
               <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label htmlFor="card" className="mb-1.5 block text-[13px] text-body">Card number</label>
+                  <label htmlFor="card" className="mb-1.5 block text-[13px] text-body">{t("Card number")}</label>
                   <input id="card" inputMode="numeric" placeholder="4242 4242 4242 4242" className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="expiry" className="mb-1.5 block text-[13px] text-body">Expiry</label>
+                  <label htmlFor="expiry" className="mb-1.5 block text-[13px] text-body">{t("Expiry")}</label>
                   <input id="expiry" placeholder="MM / YY" className={inputClass} />
                 </div>
                 <div>
-                  <label htmlFor="cvc" className="mb-1.5 block text-[13px] text-body">CVC</label>
+                  <label htmlFor="cvc" className="mb-1.5 block text-[13px] text-body">{t("CVC")}</label>
                   <input id="cvc" inputMode="numeric" placeholder="123" className={inputClass} />
                 </div>
               </div>
@@ -252,13 +254,13 @@ export function CheckoutForm() {
             {error && <p className="mt-6 text-[14px] text-red-600" role="alert">{error}</p>}
 
             <button type="submit" disabled={pending} className="mt-6 w-full rounded-sm bg-ink-2 py-3.5 text-[14px] uppercase tracking-[0.12em] text-white disabled:opacity-60">
-              {pending ? "Placing Order…" : "Place Order"}
+              {pending ? t("Placing Order…") : t("Place Order")}
             </button>
           </form>
 
           <aside className="h-fit lg:sticky lg:top-6">
             <div className="rounded-md border border-line bg-white p-6">
-              <h2 className="text-[18px] font-medium text-ink">Order Summary</h2>
+              <h2 className="text-[18px] font-medium text-ink">{t("Order Summary")}</h2>
               <ul className="mt-5 space-y-4">
                 {lines.map((line) => (
                   <li key={line.id} className="flex gap-3">
@@ -266,7 +268,7 @@ export function CheckoutForm() {
                     <img src={`/images/${line.image}`} alt={line.title} width={56} height={56} className="h-14 w-14 shrink-0 rounded-sm object-cover" />
                     <div className="flex flex-1 flex-col">
                       <span className="text-[14px] text-ink">{line.title}</span>
-                      <span className="text-[13px] text-body">Qty {line.quantity}</span>
+                      <span className="text-[13px] text-body">{t("Qty")} {line.quantity}</span>
                     </div>
                     <span className="text-[14px] font-medium text-ink">{formatPrice(line.price * line.quantity, line.currency)}</span>
                   </li>
@@ -274,22 +276,22 @@ export function CheckoutForm() {
               </ul>
 
               <div className="mt-6 border-t border-line pt-5">
-                <label htmlFor="promo" className="mb-1.5 block text-[13px] text-body">Promo code</label>
+                <label htmlFor="promo" className="mb-1.5 block text-[13px] text-body">{t("Promo code")}</label>
                 <div className="flex gap-2">
                   <input id="promo" value={promoInput} onChange={(e) => setPromoInput(e.target.value)} className={inputClass} placeholder="Enter code" />
                   <button type="button" onClick={handleApplyPromo} disabled={promoPending} className="shrink-0 rounded-sm border border-ink-2 px-4 text-[13px] uppercase tracking-[0.1em] text-ink disabled:opacity-60">
-                    {promoPending ? "…" : "Apply"}
+                    {promoPending ? "…" : t("Apply")}
                   </button>
                 </div>
                 {promo && <p className={`mt-2 text-[13px] ${promo.ok ? "text-mauve" : "text-red-600"}`} role="status">{promo.message}</p>}
               </div>
 
               <div className="mt-6 space-y-2 border-t border-line pt-5 text-[14px]">
-                <div className="flex items-center justify-between text-ink"><span>Subtotal</span><span>{formatPrice(subtotal, currency)}</span></div>
-                <div className="flex items-center justify-between text-ink"><span>Shipping</span><span>{shipping === 0 ? "FREE" : formatPrice(shipping, currency)}</span></div>
-                {discount > 0 && <div className="flex items-center justify-between text-mauve"><span>Discount</span><span>−{formatPrice(discount, currency)}</span></div>}
-                <div className="flex items-center justify-between text-ink"><span>Tax (est.)</span><span>{formatPrice(tax, currency)}</span></div>
-                <div className="flex items-center justify-between border-t border-line pt-3 text-[16px] font-medium text-ink"><span>Total</span><span>{formatPrice(total, currency)}</span></div>
+                <div className="flex items-center justify-between text-ink"><span>{t("Subtotal")}</span><span>{formatPrice(subtotal, currency)}</span></div>
+                <div className="flex items-center justify-between text-ink"><span>{t("Shipping")}</span><span>{shipping === 0 ? t("FREE") : formatPrice(shipping, currency)}</span></div>
+                {discount > 0 && <div className="flex items-center justify-between text-mauve"><span>{t("Discount")}</span><span>−{formatPrice(discount, currency)}</span></div>}
+                <div className="flex items-center justify-between text-ink"><span>{t("Tax (est.)")}</span><span>{formatPrice(tax, currency)}</span></div>
+                <div className="flex items-center justify-between border-t border-line pt-3 text-[16px] font-medium text-ink"><span>{t("Total")}</span><span>{formatPrice(total, currency)}</span></div>
               </div>
             </div>
           </aside>

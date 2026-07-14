@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
 import { login, register } from "@/lib/api";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 interface AuthFormProps {
   mode: "login" | "register";
 }
 
 export function AuthForm({ mode }: AuthFormProps) {
+  const { t } = useI18n();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -42,7 +44,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         <div className="grid grid-cols-2 gap-3">
           <input
             type="text"
-            placeholder="First name"
+            placeholder={t("First name")}
             autoComplete="given-name"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
@@ -50,7 +52,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           />
           <input
             type="text"
-            placeholder="Last name"
+            placeholder={t("Last name")}
             autoComplete="family-name"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -61,7 +63,7 @@ export function AuthForm({ mode }: AuthFormProps) {
 
       <input
         type="email"
-        placeholder="Email"
+        placeholder={t("Email")}
         autoComplete="email"
         required
         value={email}
@@ -70,7 +72,7 @@ export function AuthForm({ mode }: AuthFormProps) {
       />
       <input
         type="password"
-        placeholder="Password"
+        placeholder={t("Password")}
         autoComplete={mode === "login" ? "current-password" : "new-password"}
         required
         value={password}
@@ -83,16 +85,16 @@ export function AuthForm({ mode }: AuthFormProps) {
         disabled={pending}
         className="w-full bg-ink-2 text-white uppercase tracking-[0.12em] text-[14px] py-3.5 rounded-sm disabled:opacity-50"
       >
-        {mode === "login" ? "Sign In" : "Create Account"}
+        {mode === "login" ? t("Sign In") : t("Create Account")}
       </button>
 
       {mode === "login" ? (
         <Link href="/account/register" className="block text-[14px] text-mauve underline">
-          New here? Create an account
+          {t("New here? Create an account")}
         </Link>
       ) : (
         <Link href="/account/login" className="block text-[14px] text-mauve underline">
-          Already have an account? Sign in
+          {t("Already have an account? Sign in")}
         </Link>
       )}
 

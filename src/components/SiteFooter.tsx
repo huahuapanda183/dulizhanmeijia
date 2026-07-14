@@ -31,7 +31,7 @@ export function SiteFooter() {
               {col.links.map((link) => (
                 <li key={link.label}>
                   <Link href={link.href} className="block py-1.5 text-[14px] text-body hover:text-ink">
-                    {link.label}
+                    <T k={link.label} />
                   </Link>
                 </li>
               ))}
@@ -39,7 +39,7 @@ export function SiteFooter() {
 
             {col.title === "Social" && (
               <>
-                <h4 className="mb-3 mt-8 text-[15px] text-ink">Download Our App</h4>
+                <h4 className="mb-3 mt-8 text-[15px] text-ink"><T k="Download Our App" /></h4>
                 <div className="flex gap-3">
                   <a href="#" className="flex items-center gap-2 rounded-md bg-black px-3 py-2 text-white">
                     <span className="flex flex-col leading-none">
@@ -67,7 +67,7 @@ export function SiteFooter() {
           <div className="flex gap-6">
             {legalLinks.map((link) => (
               <Link key={link.label} href={link.href} className="text-[13px] text-body hover:text-ink">
-                {link.label}
+                <T k={link.label} />
               </Link>
             ))}
           </div>

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { ProductFacets } from "@/lib/data/types";
 import { formatPrice } from "@/lib/format";
 import { CloseIcon, ChevronDownIcon } from "@/components/icons";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 type Props = {
   facets: ProductFacets;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export function ProductFilters({ facets, basePath }: Props) {
+  const { t } = useI18n();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -100,7 +102,7 @@ export function ProductFilters({ facets, basePath }: Props) {
   const panel = (
     <div className="flex flex-col gap-8">
       {facets.shapes.length > 0 && (
-        <FilterSection title="Shape">
+        <FilterSection title={t("Shape")}>
           {facets.shapes.map((s) => (
             <CheckboxRow
               key={s.value}
@@ -114,27 +116,27 @@ export function ProductFilters({ facets, basePath }: Props) {
       )}
 
       {facets.tags.length > 0 && (
-        <FilterSection title="Type">
-          {facets.tags.map((t) => (
+        <FilterSection title={t("Type")}>
+          {facets.tags.map((tag) => (
             <CheckboxRow
-              key={t.value}
-              label={t.label}
-              count={t.count}
-              checked={selectedTags.includes(t.value)}
-              onChange={() => toggleMulti("tag", t.value)}
+              key={tag.value}
+              label={tag.label}
+              count={tag.count}
+              checked={selectedTags.includes(tag.value)}
+              onChange={() => toggleMulti("tag", tag.value)}
             />
           ))}
         </FilterSection>
       )}
 
       {max > min && (
-        <FilterSection title="Price">
+        <FilterSection title={t("Price")}>
           <PriceRange min={min} max={max} value={priceMaxValue} onCommit={setPriceMax} />
         </FilterSection>
       )}
 
-      <FilterSection title="Availability">
-        <CheckboxRow label="In stock only" checked={inStock} onChange={toggleInStock} />
+      <FilterSection title={t("Availability")}>
+        <CheckboxRow label={t("In stock only")} checked={inStock} onChange={toggleInStock} />
       </FilterSection>
     </div>
   );
@@ -148,7 +150,7 @@ export function ProductFilters({ facets, basePath }: Props) {
           onClick={() => setOpen(true)}
           className="inline-flex items-center gap-2 rounded-full border border-line bg-white px-5 py-2 text-[14px] font-medium text-ink"
         >
-          Filter
+          {t("Filter")}
           <ChevronDownIcon className="h-4 w-4" />
           {hasActiveFilters && (
             <span className="ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-mauve px-1.5 text-[11px] font-medium text-white">
@@ -169,7 +171,7 @@ export function ProductFilters({ facets, basePath }: Props) {
           />
           <div className="absolute inset-y-0 left-0 flex w-[300px] max-w-[85%] flex-col bg-cream">
             <div className="flex items-center justify-between border-b border-line px-5 py-4">
-              <span className="heading-track text-[15px] font-medium text-ink">Filters</span>
+              <span className="heading-track text-[15px] font-medium text-ink">{t("FILTERS")}</span>
               <button type="button" onClick={() => setOpen(false)} aria-label="Close">
                 <CloseIcon className="h-5 w-5 text-ink" />
               </button>
@@ -181,7 +183,7 @@ export function ProductFilters({ facets, basePath }: Props) {
                 onClick={() => setOpen(false)}
                 className="w-full rounded-full bg-mauve px-6 py-3 text-[14px] font-medium text-white"
               >
-                View results
+                {t("View results")}
               </button>
               {hasActiveFilters && (
                 <button
@@ -200,7 +202,7 @@ export function ProductFilters({ facets, basePath }: Props) {
       {/* Desktop: left column */}
       <aside className="hidden w-[240px] shrink-0 md:block">
         <div className="mb-6 flex items-center justify-between">
-          <span className="heading-track text-[15px] font-medium text-ink">Filters</span>
+          <span className="heading-track text-[15px] font-medium text-ink">{t("FILTERS")}</span>
           {hasActiveFilters && (
             <button
               type="button"
@@ -229,7 +231,7 @@ export function ProductFilters({ facets, basePath }: Props) {
             onClick={clearAll}
             className="text-[13px] text-body underline hover:text-ink"
           >
-            Clear all
+            {t("Clear all")}
           </button>
         </div>
       )}
@@ -304,11 +306,12 @@ function PriceRange({
   value: number;
   onCommit: (value: number) => void;
 }) {
+  const { t } = useI18n();
   const [local, setLocal] = useState(value);
 
   return (
     <>
-      <p className="text-[13px] text-body">Up to {formatPrice(local, "USD")}</p>
+      <p className="text-[13px] text-body">{t("Up to")} {formatPrice(local, "USD")}</p>
       <input
         type="range"
         min={min}

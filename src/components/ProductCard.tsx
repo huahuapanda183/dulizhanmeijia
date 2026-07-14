@@ -4,6 +4,7 @@ import { AddToBagButton } from "@/components/AddToBagButton";
 import { WishlistButton } from "@/components/WishlistButton";
 import { ProductLink } from "@/components/ProductLink";
 import { formatPrice } from "@/lib/format";
+import { T } from "@/lib/i18n/i18n-context";
 import type { Product } from "@/lib/data/types";
 
 /**
@@ -65,7 +66,7 @@ export function ProductCard({
 
         <div className="mt-3 text-center">
           <h3 className="text-[19px] font-medium text-ink">{product.title}</h3>
-          <p className="mt-0.5 text-[15px] text-body">{product.shape}</p>
+          <p className="mt-0.5 text-[15px] text-body"><T k={product.shape} /></p>
           <p className="mt-1 text-[15px]">
             {onSale && (
               <span className="mr-2 text-body line-through">

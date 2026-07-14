@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CarouselRail } from "@/components/CarouselRail";
 import { CATEGORY_CARDS } from "@/lib/data/content";
+import { T } from "@/lib/i18n/i18n-context";
 
 export function CategoryCards() {
   return (
@@ -22,7 +23,7 @@ export function CategoryCards() {
               />
               <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" />
               <span className="absolute bottom-6 left-6 text-[18px] font-semibold uppercase tracking-[0.06em] text-white md:text-[20px]">
-                {category.label}
+                <T k={category.label} />
               </span>
             </Link>
           ))}

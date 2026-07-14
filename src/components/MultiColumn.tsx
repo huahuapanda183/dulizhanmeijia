@@ -1,4 +1,5 @@
 import { FEATURE_CARDS } from "@/lib/data/content";
+import { T } from "@/lib/i18n/i18n-context";
 
 export function MultiColumn() {
   return (
@@ -18,7 +19,7 @@ export function MultiColumn() {
               loading="lazy"
             />
             <span className="absolute bottom-7 left-7 text-[22px] font-semibold text-white underline decoration-1 underline-offset-4 md:text-[26px]">
-              {card.label}
+              <T k={card.label} />
             </span>
           </a>
         ))}

@@ -1,6 +1,7 @@
 import { CarouselRail } from "@/components/CarouselRail";
 import { ProductCard } from "@/components/ProductCard";
 import { getRecommendations } from "@/lib/api";
+import { T } from "@/lib/i18n/i18n-context";
 
 /**
  * "You May Also Like" rail for the product detail page. Server component —
@@ -13,7 +14,7 @@ export async function Recommendations({ handle }: { handle: string }) {
   return (
     <section className="mt-16 border-t border-line pt-12">
       <h2 className="heading-track mb-8 text-center text-[26px] font-medium text-ink md:text-[32px]">
-        You May Also Like
+        <T k="You May Also Like" />
       </h2>
       <CarouselRail ariaLabel="Recommendations">
         {products.map((p) => (

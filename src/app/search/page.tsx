@@ -8,6 +8,7 @@ import { CollectionSort } from "@/components/CollectionSort";
 import { getProducts, getProductFacets } from "@/lib/api";
 import type { SortKey } from "@/lib/data/types";
 import { formatCount } from "@/lib/format";
+import { T } from "@/lib/i18n/i18n-context";
 
 type SearchParamsRecord = Record<string, string | string[] | undefined>;
 
@@ -54,17 +55,19 @@ export default async function SearchPage({ searchParams }: Params) {
           <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
               <h1 className="heading-track text-[26px] font-medium text-ink md:text-[32px]">
-                Search
+                <T k="Search results" />
               </h1>
 
               {query ? (
                 <p className="mt-2 text-[15px] text-body">
-                  {formatCount(results.length)} result{results.length === 1 ? "" : "s"} for
+                  {formatCount(results.length)}{" "}
+                  <T k={results.length === 1 ? "result" : "results"} />{" "}
+                  <T k="for" />{" "}
                   “{query}”
                 </p>
               ) : (
                 <p className="mt-2 text-[15px] text-body">
-                  Enter a search term to find products.
+                  <T k="Enter a search term to find products." />
                 </p>
               )}
             </div>
@@ -74,13 +77,13 @@ export default async function SearchPage({ searchParams }: Params) {
           {query && !hasBaseMatches ? (
             <div className="mx-auto mt-16 flex max-w-md flex-col items-center text-center">
               <p className="text-[15px] text-body">
-                No results for “{query}”. Try another search.
+                <T k="No results for" /> “{query}”. <T k="Try another search." />
               </p>
               <Link
                 href="/collections/all"
                 className="mt-6 inline-flex items-center justify-center rounded-full bg-mauve px-8 py-3 text-[14px] font-medium text-white transition-opacity hover:opacity-90"
               >
-                Shop all products
+                <T k="Shop All" />
               </Link>
             </div>
           ) : query ? (
@@ -90,7 +93,7 @@ export default async function SearchPage({ searchParams }: Params) {
               <div className="flex-1">
                 {results.length === 0 ? (
                   <p className="py-24 text-center text-[15px] text-body">
-                    No products match your filters.
+                    <T k="No products match your filters." />
                   </p>
                 ) : (
                   <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">

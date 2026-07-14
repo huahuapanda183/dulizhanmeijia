@@ -13,6 +13,7 @@ import { ClockIcon, CalendarIcon, SalonIcon, BunnyIcon } from "@/components/icon
 import { getProduct, getAllProductHandles } from "@/lib/api";
 import { PRODUCT_FEATURES, MEMBERSHIP_PERKS } from "@/lib/data/content";
 import { formatPrice, formatCount } from "@/lib/format";
+import { T } from "@/lib/i18n/i18n-context";
 
 type Params = { params: Promise<{ handle: string }> };
 
@@ -46,7 +47,7 @@ export default async function ProductPage({ params }: Params) {
 
             <div className="lg:pt-2">
               <span className="inline-block border border-mauve px-4 py-2 text-[13px] font-semibold uppercase tracking-[0.12em] text-ink">
-                {product.shape}
+                <T k={product.shape} />
               </span>
 
               <h1 className="mt-6 text-[38px] font-medium leading-none text-ink md:text-[44px]">
@@ -80,7 +81,7 @@ export default async function ProductPage({ params }: Params) {
                 <span className="inline-flex items-center rounded-[4px] bg-[#5a31f4] px-1.5 py-0.5 align-middle text-[12px] font-semibold text-white">
                   shop<span className="font-normal">Pay</span>
                 </span>{" "}
-                <a href="#" className="underline">Learn more</a>
+                <a href="#" className="underline"><T k="Learn more" /></a>
               </p>
 
               <div className="mt-8 grid grid-cols-4 gap-4 border-y border-line py-6">
@@ -89,7 +90,7 @@ export default async function ProductPage({ params }: Params) {
                   return (
                     <div key={f.icon} className="flex flex-col items-center gap-2 text-center">
                       <Icon className="h-8 w-8 text-ink" />
-                      <span className="whitespace-pre-line text-[12px] leading-tight text-body">{f.label}</span>
+                      <span className="whitespace-pre-line text-[12px] leading-tight text-body"><T k={f.label} /></span>
                     </div>
                   );
                 })}
@@ -100,12 +101,12 @@ export default async function ProductPage({ params }: Params) {
                   <LynxiGlamMark className="h-14 w-14 shrink-0 text-ink" />
                   <div className="flex-1">
                     <h2 className="text-[15px] font-bold uppercase tracking-[0.04em] text-ink">
-                      Join LynxiGlam Insider Plus Membership
+                      <T k="Join LynxiGlam Insider Plus Membership" />
                     </h2>
                     <ul className="mt-3 space-y-1.5">
                       {MEMBERSHIP_PERKS.map((perk) => (
                         <li key={perk} className="ml-4 list-disc text-[14px] text-body">
-                          {perk}
+                          <T k={perk} />
                         </li>
                       ))}
                     </ul>
@@ -115,13 +116,13 @@ export default async function ProductPage({ params }: Params) {
                   type="button"
                   className="mt-5 w-full rounded-sm bg-burgundy py-3.5 text-[15px] font-semibold uppercase tracking-[0.1em] text-white transition-opacity hover:opacity-90"
                 >
-                  Sign Up Now – $59.99/YR
+                  <T k="Sign Up Now – $59.99/YR" />
                 </button>
               </div>
 
               <div className="mt-10 border-t border-line pt-8">
-                <h2 className="text-[15px] font-semibold uppercase tracking-[0.1em] text-ink">Description</h2>
-                <p className="mt-3 text-[15px] leading-relaxed text-body">{product.description}</p>
+                <h2 className="text-[15px] font-semibold uppercase tracking-[0.1em] text-ink"><T k="Description" /></h2>
+                <p className="mt-3 text-[15px] leading-relaxed text-body"><T k={product.description} /></p>
               </div>
             </div>
           </div>
