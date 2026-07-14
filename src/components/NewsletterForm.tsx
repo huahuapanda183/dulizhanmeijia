@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import Link from "next/link";
 import { subscribe } from "@/lib/api";
 import { ChevronRightIcon } from "@/components/icons";
 
@@ -79,13 +80,13 @@ export function NewsletterForm() {
           personalized marketing text messages (e.g. cart reminders) from Glamnetic at the cell
           number used when signing up. Consent is not a condition of any purchase. Reply HELP for
           help and STOP to cancel. Msg frequency varies. Msg &amp; data rates may apply. View{" "}
-          <a href="/pages/terms" className="underline">
+          <Link href="/pages/terms" className="underline">
             Terms
-          </a>{" "}
+          </Link>{" "}
           &amp;{" "}
-          <a href="/pages/privacy" className="underline">
+          <Link href="/pages/privacy" className="underline">
             Privacy
-          </a>
+          </Link>
           .
         </p>
       </div>

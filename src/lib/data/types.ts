@@ -93,6 +93,35 @@ export interface Review {
   createdAt: string; // ISO
 }
 
+export interface PageSection {
+  heading?: string;
+  /** paragraphs of body copy */
+  body: string[];
+}
+
+export interface FaqItem {
+  q: string;
+  a: string;
+}
+
+export interface Page {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  sections: PageSection[];
+  faq?: FaqItem[];
+}
+
+export interface BlogPost {
+  handle: string;
+  title: string;
+  excerpt: string;
+  image: string;
+  author: string;
+  date: string; // ISO
+  body: string[];
+}
+
 export type SortKey = "featured" | "best-selling" | "price-asc" | "price-desc" | "rating" | "newest";
 
 export interface ProductQuery {

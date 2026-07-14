@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export function ShopIRL() {
   return (
     <section
@@ -17,12 +19,12 @@ export function ShopIRL() {
           <h2 className="heading-track text-[32px] font-medium text-ink md:text-[44px]">
             Shop Us IRL
           </h2>
-          <a
+          <Link
             href="/pages/store-locator"
             className="mt-6 inline-block bg-mauve px-9 py-3.5 text-[14px] font-medium uppercase tracking-[0.12em] text-white transition-colors hover:bg-mauve-dark"
           >
             Find Us
-          </a>
+          </Link>
         </div>
       </div>
     </section>

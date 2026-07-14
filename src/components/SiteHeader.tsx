@@ -37,41 +37,47 @@ export async function SiteHeader() {
 
               {item.columns && (
                 <div className="invisible absolute inset-x-0 top-full z-40 opacity-0 transition-opacity duration-150 group-hover/nav:visible group-hover/nav:opacity-100 group-focus-within/nav:visible group-focus-within/nav:opacity-100">
-                  <div className="mx-auto flex max-w-[1500px] gap-12 border-t border-line bg-[#f4f1ef] px-8 py-8 shadow-[0_12px_20px_-8px_rgba(0,0,0,0.15)]">
-                    {item.columns.map((col) => (
-                      <div key={col.heading ?? col.links[0]?.label} className="min-w-[180px]">
-                        {col.heading && (
-                          <h4 className="mb-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-body">
-                            {col.heading}
-                          </h4>
-                        )}
-                        <ul className="space-y-2">
-                          {col.links.map((l) => (
-                            <li key={l.label}>
-                              <Link href={l.href} className="text-[14px] text-ink transition-colors hover:text-mauve">
-                                {l.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-
-                    {item.featured?.map((f) => (
-                      <Link key={f.label} href={f.href} className="group/feat ml-auto block w-[280px]">
-                        <div className="relative aspect-[16/10] overflow-hidden rounded-sm">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src={`/images/${f.image}`}
-                            alt={f.label}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover/feat:scale-105"
-                          />
+                  <div className="mx-auto max-w-[1500px] border-t border-line bg-[#f4f1ef] px-8 py-8 text-left shadow-[0_12px_20px_-8px_rgba(0,0,0,0.15)]">
+                    <div className="flex gap-12">
+                      {item.columns.map((col) => (
+                        <div key={col.heading ?? col.links[0]?.label} className="min-w-[200px] flex-1">
+                          {col.heading && (
+                            <h4 className="mb-3 text-[12px] font-semibold uppercase tracking-[0.12em] text-body">
+                              {col.heading}
+                            </h4>
+                          )}
+                          <ul className="space-y-2">
+                            {col.links.map((l) => (
+                              <li key={l.label}>
+                                <Link href={l.href} className="text-[14px] text-ink transition-colors hover:text-mauve">
+                                  {l.label}
+                                </Link>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <span className="mt-2 block text-[13px] font-semibold uppercase tracking-[0.06em] text-ink">
-                          {f.label}
-                        </span>
-                      </Link>
-                    ))}
+                      ))}
+                    </div>
+
+                    {item.featured && item.featured.length > 0 && (
+                      <div className="mt-8 flex flex-wrap gap-4">
+                        {item.featured.map((f) => (
+                          <Link key={f.label} href={f.href} className="group/feat block w-[240px]">
+                            <div className="relative aspect-[16/11] overflow-hidden rounded-sm">
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={`/images/${f.image}`}
+                                alt={f.label}
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover/feat:scale-105"
+                              />
+                            </div>
+                            <span className="mt-2 block text-[13px] font-semibold uppercase tracking-[0.06em] text-ink">
+                              {f.label}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}

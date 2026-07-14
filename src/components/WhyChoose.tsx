@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 /**
  * "Why Choose Glamnetic?" banner — a single full-width burgundy image with the
  * heading, copy and award badges (Allure / Cosmopolitan / Leaping Bunny) baked in.
@@ -5,7 +7,7 @@
 export function WhyChoose() {
   return (
     <section aria-label="Why choose Glamnetic" className="w-full bg-burgundy">
-      <a href="/pages/about" className="block">
+      <Link href="/pages/about" className="block">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/images/badges_desktop_38ca45e0-5783-490c-86ac-aed6617c66da.webp"
@@ -20,7 +22,7 @@ export function WhyChoose() {
           className="block h-auto w-full md:hidden"
           loading="lazy"
         />
-      </a>
+      </Link>
     </section>
   );
 }
