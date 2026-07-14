@@ -206,6 +206,7 @@ export const zh: Record<string, string> = {
   "Join LynxiGlam Insider Plus Membership": "加入 LynxiGlam Insider Plus 会员",
   "Sign Up Now – $59.99/YR": "立即加入 – $59.99/年",
   "Learn more": "了解更多",
+  "Pay over time for orders over $35.00 with": "满 $35.00 订单可分期付款，使用",
   "You May Also Like": "你可能还喜欢",
   "Write a Review": "写评价",
   "Verified Buyer": "已验证买家",

@@ -77,7 +77,7 @@ export default async function ProductPage({ params }: Params) {
               </div>
 
               <p className="mt-5 text-[14px] text-body">
-                Pay over time for orders over $35.00 with{" "}
+                <T k="Pay over time for orders over $35.00 with" />{" "}
                 <span className="inline-flex items-center rounded-[4px] bg-[#5a31f4] px-1.5 py-0.5 align-middle text-[12px] font-semibold text-white">
                   shop<span className="font-normal">Pay</span>
                 </span>{" "}

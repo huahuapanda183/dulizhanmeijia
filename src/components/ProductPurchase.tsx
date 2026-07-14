@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { MinusIcon, PlusIcon } from "@/components/icons";
 import { useCart } from "@/lib/cart/cart-context";
+import { useI18n } from "@/lib/i18n/i18n-context";
 import { trackEvent } from "@/lib/api";
 import type { Product } from "@/lib/data/types";
 
@@ -15,6 +16,7 @@ export function ProductPurchase({ product }: { product: Product }) {
   const [qty, setQty] = useState(1);
   const [nail, setNail] = useState(0);
   const { addItem } = useCart();
+  const { t } = useI18n();
 
   return (
     <div className="flex flex-col gap-4">
@@ -38,7 +40,7 @@ export function ProductPurchase({ product }: { product: Product }) {
           disabled={!product.available}
           className="flex-1 rounded-sm bg-ink-2 py-3.5 text-[15px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {product.available ? "Add to Bag" : "Sold Out"}
+          {product.available ? t("Add to Bag") : t("Sold Out")}
         </button>
       </div>
 
