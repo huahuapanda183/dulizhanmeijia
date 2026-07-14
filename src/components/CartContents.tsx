@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
 import { MinusIcon, PlusIcon, BagIcon } from "@/components/icons";
+import { FreeShippingBar } from "@/components/FreeShippingBar";
 
 export function CartContents() {
   const { lines, subtotal, currency, updateQuantity, removeItem } = useCart();
@@ -26,7 +27,11 @@ export function CartContents() {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
+        <>
+          <div className="-mx-5 mb-6">
+            <FreeShippingBar />
+          </div>
+          <div className="grid gap-10 lg:grid-cols-[1fr_360px]">
           {/* Line items */}
           <div>
             {lines.map((line) => (
@@ -98,15 +103,12 @@ export function CartContents() {
               Shipping &amp; taxes calculated at checkout
             </p>
 
-            <button
-              type="button"
-              onClick={() =>
-                alert("Checkout is a demo — connect a payment backend to complete.")
-              }
-              className="mt-6 w-full bg-ink-2 text-white uppercase tracking-[0.12em] py-3.5 rounded-sm text-[14px]"
+            <Link
+              href="/checkout"
+              className="mt-6 block w-full bg-ink-2 text-white text-center uppercase tracking-[0.12em] py-3.5 rounded-sm text-[14px]"
             >
               Checkout
-            </button>
+            </Link>
 
             <Link
               href="/collections/all"
@@ -115,7 +117,8 @@ export function CartContents() {
               Continue Shopping
             </Link>
           </aside>
-        </div>
+          </div>
+        </>
       )}
     </div>
   );

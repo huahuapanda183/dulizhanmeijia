@@ -128,5 +128,101 @@ export interface ProductQuery {
   collection?: string;
   search?: string;
   sort?: SortKey;
+  /** filter: only products whose shape is in this list */
+  shapes?: string[];
+  /** filter: only products tagged with any of these */
+  tags?: string[];
+  priceMin?: number;
+  priceMax?: number;
+  /** filter: only in-stock */
+  inStock?: boolean;
   limit?: number;
+  page?: number;
+  pageSize?: number;
+}
+
+/** A single facet value + how many products match it. */
+export interface FacetValue {
+  value: string;
+  label: string;
+  count: number;
+}
+
+/** Available filters for a collection/search result set. */
+export interface ProductFacets {
+  shapes: FacetValue[];
+  tags: FacetValue[];
+  priceRange: { min: number; max: number };
+}
+
+/** Paginated list envelope returned by list endpoints. */
+export interface Paginated<T> {
+  items: T[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+// ---- Checkout / orders ----
+
+export interface Address {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  zip: string;
+  country: string;
+}
+
+export interface ShippingRate {
+  id: string;
+  label: string;
+  amount: number;
+  estimate: string;
+}
+
+export interface PromoResult {
+  ok: boolean;
+  code: string;
+  /** discount amount applied to the subtotal */
+  amount: number;
+  message: string;
+}
+
+export interface OrderLineInput {
+  handle: string;
+  quantity: number;
+}
+
+export interface OrderInput {
+  lines: OrderLineInput[];
+  email: string;
+  shippingAddress: Address;
+  shippingRateId: string;
+  promoCode?: string;
+}
+
+export interface Order {
+  id: string;
+  number: string;
+  email: string;
+  lines: CartLine[];
+  subtotal: number;
+  shipping: number;
+  discount: number;
+  tax: number;
+  total: number;
+  currency: string;
+  shippingAddress: Address;
+  status: "confirmed" | "processing" | "shipped" | "delivered";
+  createdAt: string;
+}
+
+export interface WishlistItem {
+  handle: string;
+  addedAt: string;
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { StarIcon } from "@/components/icons";
 import { AddToBagButton } from "@/components/AddToBagButton";
+import { WishlistButton } from "@/components/WishlistButton";
 import { formatPrice } from "@/lib/format";
 import type { Product } from "@/lib/data/types";
 
@@ -26,6 +27,7 @@ export function ProductCard({
     <article className={cn("group/card", width, className)}>
       <Link href={href} className="block">
         <div className="relative aspect-square overflow-hidden rounded-sm bg-white">
+          <WishlistButton handle={product.handle} className="absolute left-3 top-3 z-10" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={`/images/${product.images[0]}`}

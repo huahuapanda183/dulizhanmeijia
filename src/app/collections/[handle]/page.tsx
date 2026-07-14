@@ -1,18 +1,30 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getCollection, getCollectionHandles, getProducts } from "@/lib/api";
+import {
+  getCollection,
+  getCollectionHandles,
+  getProducts,
+  getProductFacets,
+} from "@/lib/api";
 import type { SortKey } from "@/lib/data/types";
 import { formatCount } from "@/lib/format";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductFilters } from "@/components/ProductFilters";
 import { CollectionSort } from "@/components/CollectionSort";
 import { AnnouncementBar } from "@/components/AnnouncementBar";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 
+type SearchParamsRecord = Record<string, string | string[] | undefined>;
+
 type Params = {
   params: Promise<{ handle: string }>;
-  searchParams: Promise<{ sort?: string }>;
+  searchParams: Promise<SearchParamsRecord>;
 };
+
+function arrayOf(v: string | string[] | undefined): string[] {
+  return Array.isArray(v) ? v : v ? [v] : [];
+}
 
 export async function generateStaticParams() {
   return (await getCollectionHandles()).map((handle) => ({ handle }));
@@ -28,14 +40,26 @@ export async function generateMetadata({ params }: Pick<Params, "params">) {
 
 export default async function CollectionPage({ params, searchParams }: Params) {
   const { handle } = await params;
-  const { sort } = await searchParams;
+  const sp = await searchParams;
   const collection = await getCollection(handle);
   if (!collection) notFound();
 
-  const products = await getProducts({
+  const sort = (typeof sp.sort === "string" ? sp.sort : undefined) as SortKey | undefined;
+  const priceMaxRaw = typeof sp.priceMax === "string" ? Number(sp.priceMax) : undefined;
+
+  const query = {
     collection: handle,
-    sort: (sort as SortKey) || "featured",
-  });
+    sort: sort || "featured",
+    shapes: arrayOf(sp.shape),
+    tags: arrayOf(sp.tag),
+    priceMax: Number.isFinite(priceMaxRaw) ? priceMaxRaw : undefined,
+    inStock: sp.inStock === "1",
+  };
+
+  const [products, facets] = await Promise.all([
+    getProducts(query),
+    getProductFacets({ collection: handle }),
+  ]);
 
   return (
     <>
@@ -67,15 +91,23 @@ export default async function CollectionPage({ params, searchParams }: Params) {
             </div>
           </div>
 
-          {products.length === 0 ? (
-            <p className="py-24 text-center text-[15px] text-body">No products found.</p>
-          ) : (
-            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-              {products.map((p) => (
-                <ProductCard key={p.id} product={p} layout="grid" />
-              ))}
+          <div className="flex flex-col gap-8 pb-16 md:flex-row">
+            <ProductFilters facets={facets} basePath={`/collections/${handle}`} />
+
+            <div className="flex-1">
+              {products.length === 0 ? (
+                <p className="py-24 text-center text-[15px] text-body">
+                  No products match your filters.
+                </p>
+              ) : (
+                <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3">
+                  {products.map((p) => (
+                    <ProductCard key={p.id} product={p} layout="grid" />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </main>
       <SiteFooter />

@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ProductGallery } from "@/components/ProductGallery";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ProductReviews } from "@/components/ProductReviews";
+import { Recommendations } from "@/components/Recommendations";
 import { Stars } from "@/components/Stars";
 import { ClockIcon, CalendarIcon, SalonIcon, BunnyIcon } from "@/components/icons";
 import { getProduct, getAllProductHandles } from "@/lib/api";
@@ -127,6 +128,8 @@ export default async function ProductPage({ params }: Params) {
           <div id="reviews" className="mt-16 border-t border-line pt-12">
             <ProductReviews handle={product.handle} />
           </div>
+
+          <Recommendations handle={product.handle} />
         </div>
       </main>
       <SiteFooter />

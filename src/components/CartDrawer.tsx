@@ -5,6 +5,7 @@ import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { CloseIcon, MinusIcon, PlusIcon, BagIcon } from "@/components/icons";
+import { FreeShippingBar } from "@/components/FreeShippingBar";
 
 export function CartDrawer() {
   const { lines, subtotal, itemCount, currency, isOpen, closeCart, updateQuantity, removeItem } = useCart();
@@ -53,6 +54,7 @@ export function CartDrawer() {
           </div>
         ) : (
           <>
+            <FreeShippingBar />
             <ul className="flex-1 overflow-y-auto px-5">
               {lines.map((line) => (
                 <li key={line.id} className="flex gap-4 border-b border-line py-4">
@@ -97,13 +99,13 @@ export function CartDrawer() {
                 <span className="font-medium text-ink">{formatPrice(subtotal, currency)}</span>
               </div>
               <p className="mt-1 text-[12px] text-body">Shipping &amp; taxes calculated at checkout.</p>
-              <button
-                type="button"
-                onClick={() => alert("Checkout is a demo — connect a payment backend to complete.")}
-                className="mt-4 w-full rounded-sm bg-ink-2 py-3.5 text-[14px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-ink"
+              <Link
+                href="/checkout"
+                onClick={closeCart}
+                className="mt-4 block w-full rounded-sm bg-ink-2 py-3.5 text-center text-[14px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-ink"
               >
                 Checkout
-              </button>
+              </Link>
               <Link
                 href="/cart"
                 onClick={closeCart}
