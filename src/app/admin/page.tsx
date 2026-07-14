@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getProducts, getCollections } from "@/lib/api";
 import { formatPrice, formatCount } from "@/lib/format";
+import { AnalyticsOverview } from "@/components/admin/AnalyticsOverview";
 
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
@@ -39,6 +40,11 @@ export default async function AdminDashboardPage() {
         <StatCard label="Collections" value={formatCount(totalCollections)} />
         <StatCard label="Avg Rating" value={`${avgRating} ★`} />
         <StatCard label="Revenue (demo)" value={formatPrice(revenue, currency)} />
+      </div>
+
+      {/* Analytics overview */}
+      <div className="mt-8">
+        <AnalyticsOverview />
       </div>
 
       {/* Recent products */}

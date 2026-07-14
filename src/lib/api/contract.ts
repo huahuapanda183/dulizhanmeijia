@@ -26,9 +26,11 @@ import type {
   OrderInput,
   Address,
   WishlistItem,
+  AnalyticsSummary,
 } from "@/lib/data/types";
 import type { ReviewSummary } from "./reviews";
 import type { ActionResult, AuthInput, SubscribeInput } from "./account";
+import type { TrackInput } from "./analytics";
 
 export interface StoreApi {
   // Catalog
@@ -67,4 +69,8 @@ export interface StoreApi {
   subscribe(input: SubscribeInput): Promise<ActionResult>;
   getWishlist(): Promise<WishlistItem[]>;
   saveWishlist(items: WishlistItem[]): Promise<{ ok: boolean }>;
+
+  // Analytics (click / view tracking)
+  trackEvent(input: TrackInput): Promise<void>;
+  getAnalytics(): Promise<AnalyticsSummary>;
 }

@@ -7,6 +7,7 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { ProductPurchase } from "@/components/ProductPurchase";
 import { ProductReviews } from "@/components/ProductReviews";
 import { Recommendations } from "@/components/Recommendations";
+import { TrackProductView } from "@/components/TrackProductView";
 import { Stars } from "@/components/Stars";
 import { ClockIcon, CalendarIcon, SalonIcon, BunnyIcon } from "@/components/icons";
 import { getProduct, getAllProductHandles } from "@/lib/api";
@@ -37,6 +38,7 @@ export default async function ProductPage({ params }: Params) {
     <>
       <AnnouncementBar />
       <SiteHeader />
+      <TrackProductView handle={product.handle} title={product.title} />
       <main className="flex-1 bg-cream">
         <div className="mx-auto max-w-[1400px] px-4 py-8 md:px-8 md:py-12">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-14">

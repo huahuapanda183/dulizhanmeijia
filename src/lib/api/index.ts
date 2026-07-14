@@ -8,6 +8,7 @@ export * from "./account";
 export * from "./content";
 export * from "./checkout";
 export * from "./wishlist";
+export * from "./analytics";
 export { API_CONFIG } from "./config";
 
 import * as products from "./products";
@@ -17,6 +18,7 @@ import * as account from "./account";
 import * as content from "./content";
 import * as checkout from "./checkout";
 import * as wishlist from "./wishlist";
+import * as analytics from "./analytics";
 import type { StoreApi } from "./contract";
 
 export type { StoreApi } from "./contract";
@@ -32,4 +34,5 @@ export const api = {
   ...content,
   ...checkout,
   ...wishlist,
+  ...analytics,
 } satisfies StoreApi;

@@ -226,3 +226,31 @@ export interface WishlistItem {
   handle: string;
   addedAt: string;
 }
+
+// ---- Analytics (click / view tracking) ----
+
+export type AnalyticsEventType = "view" | "click" | "add";
+
+export interface AnalyticsEvent {
+  type: AnalyticsEventType;
+  handle: string;
+  title: string;
+  at: string; // ISO
+}
+
+/** Per-product aggregated counts. */
+export interface ProductAnalytics {
+  handle: string;
+  title: string;
+  views: number;
+  clicks: number;
+  adds: number;
+}
+
+export interface AnalyticsSummary {
+  totalViews: number;
+  totalClicks: number;
+  totalAdds: number;
+  /** per-product breakdown, unsorted */
+  products: ProductAnalytics[];
+}

@@ -2,6 +2,7 @@
 
 import { useCart } from "@/lib/cart/cart-context";
 import { useI18n } from "@/lib/i18n/i18n-context";
+import { trackEvent } from "@/lib/api";
 import type { Product } from "@/lib/data/types";
 import { cn } from "@/lib/utils";
 
@@ -18,7 +19,10 @@ export function AddToBagButton({ product, quantity = 1, className, label = "Add 
   return (
     <button
       type="button"
-      onClick={() => addItem(product, quantity)}
+      onClick={() => {
+        addItem(product, quantity);
+        void trackEvent({ type: "add", handle: product.handle, title: product.title });
+      }}
       disabled={!product.available}
       className={cn("disabled:cursor-not-allowed disabled:opacity-50", className)}
     >
