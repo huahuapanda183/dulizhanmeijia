@@ -5,9 +5,9 @@ import type { Product } from "./types";
 
 const DESC =
   "Reusable press-on nails that go on in minutes and last up to two weeks. Each set includes 30 nails, nail glue, a nail file, cuticle stick and alcohol pad — everything you need for a salon-quality manicure at home.";
-const ACC = "A Glamnetic essential for a flawless, long-lasting press-on manicure at home.";
+const ACC = "A LynxiGlam essential for a flawless, long-lasting press-on manicure at home.";
 const LASH = "Reusable magnetic lashes that apply in seconds with no glue — just pair with a magnetic liner. Wear each pair up to 60 times.";
-const LINER = "The magnetic liner that holds Glamnetic lashes in place all day. Smudge-proof, easy to apply and easy to remove.";
+const LINER = "The magnetic liner that holds LynxiGlam lashes in place all day. Smudge-proof, easy to apply and easy to remove.";
 
 const base = {
   currency: "USD",

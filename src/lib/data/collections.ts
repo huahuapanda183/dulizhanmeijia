@@ -4,7 +4,7 @@ import type { Collection, NavItem } from "./types";
 
 export const COLLECTIONS: Omit<Collection, "products">[] = [
   { handle: "all", title: "Shop All", description: "Every press-on nail set, lash, bundle and accessory.", image: "Shop_Nails.png" },
-  { handle: "shop-all-glamnetic-products", title: "Shop All Glamnetic Products", description: "The full Glamnetic lineup — nails, lashes, liners and accessories.", image: "Shop_Nails.png" },
+  { handle: "shop-all-glamnetic-products", title: "Shop All LynxiGlam Products", description: "The full LynxiGlam lineup — nails, lashes, liners and accessories.", image: "Shop_Nails.png" },
   { handle: "all-nails", title: "Glue-On Nails", description: "Reusable press-on nails in every shape and style.", image: "Shop_Nails.png" },
   { handle: "press-on-nails", title: "Press-On Nails", description: "Salon-quality press-on nails.", image: "Shop_Nails.png" },
   { handle: "best-sellers", title: "Best Sellers", description: "Our most-loved sets.", image: "CitrusCoast_1.webp" },
@@ -18,12 +18,12 @@ export const COLLECTIONS: Omit<Collection, "products">[] = [
   { handle: "french", title: "French Tips", description: "Timeless French manicures.", image: "LaPerle_1.webp" },
   // Collabs
   { handle: "nail-collabs", title: "Nail Collabs", description: "Limited-edition collaborations.", image: "2026_06_Glamzilla_HP_Desktop.webp" },
-  { handle: "glamzilla", title: "Glamnetic x Glamzilla", description: "GLAMSQUAD FOREVER — by the squad, for the squad.", image: "2026_06_Glamzilla_HP_Desktop.webp" },
-  { handle: "harry-potter", title: "Harry Potter™ x Glamnetic", description: "Cast a spell with the Wizarding World collection.", image: "Obsidian_1.webp" },
+  { handle: "glamzilla", title: "LynxiGlam x Glamzilla", description: "GLAMSQUAD FOREVER — by the squad, for the squad.", image: "2026_06_Glamzilla_HP_Desktop.webp" },
+  { handle: "harry-potter", title: "Harry Potter™ x LynxiGlam", description: "Cast a spell with the Wizarding World collection.", image: "Obsidian_1.webp" },
   { handle: "hello-kitty", title: "Hello Kitty® and Friends", description: "Supercute press-on nails with Hello Kitty and Friends.", image: "Moonstone-1.webp" },
-  { handle: "fanatics", title: "Glamnetic x Fanatics", description: "Rep your team in style.", image: "MysticTopaz_1.webp" },
+  { handle: "fanatics", title: "LynxiGlam x Fanatics", description: "Rep your team in style.", image: "MysticTopaz_1.webp" },
   // Quick press + accessories
-  { handle: "quick-press-mani", title: "Quick Press Mani", description: "Our fastest mani yet.", image: "Glamnetic_QuickPressMani_Homepage_CategoryModule.webp" },
+  { handle: "quick-press-mani", title: "Quick Press Mani", description: "Our fastest mani yet.", image: "LynxiGlam_QuickPressMani_Homepage_CategoryModule.webp" },
   { handle: "accessories", title: "Nail Accessories", description: "Glue, removers and tools.", image: "SHOP_ACCESSORIE.png" },
   // Lashes & liners
   { handle: "all-lashes", title: "Lashes & Liner", description: "Reusable magnetic lashes and liners.", image: "Magnetic_Lashes.jpg" },
@@ -53,10 +53,10 @@ export const NAVIGATION: NavItem[] = [
       {
         heading: "Nail Collabs",
         links: [
-          { label: "GLAMNETIC X GLAMZILLA", href: "/collections/glamzilla" },
-          { label: "Harry Potter™ x Glamnetic", href: "/collections/harry-potter" },
+          { label: "LYNXIGLAM X GLAMZILLA", href: "/collections/glamzilla" },
+          { label: "Harry Potter™ x LynxiGlam", href: "/collections/harry-potter" },
           { label: "Hello Kitty® and Friends", href: "/collections/hello-kitty" },
-          { label: "Glamnetic x Fanatics", href: "/collections/fanatics" },
+          { label: "LynxiGlam x Fanatics", href: "/collections/fanatics" },
         ],
       },
       {
@@ -128,7 +128,7 @@ export const NAVIGATION: NavItem[] = [
       },
     ],
     featured: [
-      { label: "Our Fastest Mani Yet", image: "Glamnetic_QuickPressMani_Homepage_CategoryModule.webp", href: "/collections/quick-press-mani" },
+      { label: "Our Fastest Mani Yet", image: "LynxiGlam_QuickPressMani_Homepage_CategoryModule.webp", href: "/collections/quick-press-mani" },
     ],
   },
   {

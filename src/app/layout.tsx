@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Sofia_Sans } from "next/font/google";
 import "./globals.css";
+import { I18nProvider } from "@/lib/i18n/i18n-context";
 import { CartProvider } from "@/lib/cart/cart-context";
 import { WishlistProvider } from "@/lib/wishlist/wishlist-context";
 import { UIProvider } from "@/lib/ui/ui-context";
@@ -15,9 +16,9 @@ const sofia = Sofia_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Magnetic Eyelashes & Press-on Nails I Glamnetic",
+  title: "Magnetic Eyelashes & Press-on Nails I LynxiGlam",
   description:
-    "Glamnetic offers premium magnetic eyelashes and press-on nails that are reusable, easy to apply, and long lasting.",
+    "LynxiGlam offers premium magnetic eyelashes and press-on nails that are reusable, easy to apply, and long lasting.",
 };
 
 export default function RootLayout({
@@ -28,15 +29,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${sofia.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-cream text-ink">
-        <CartProvider>
-          <WishlistProvider>
-            <UIProvider>
-              {children}
-              <CartDrawer />
-              <SearchOverlay />
-            </UIProvider>
-          </WishlistProvider>
-        </CartProvider>
+        <I18nProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <UIProvider>
+                {children}
+                <CartDrawer />
+                <SearchOverlay />
+              </UIProvider>
+            </WishlistProvider>
+          </CartProvider>
+        </I18nProvider>
       </body>
     </html>
   );

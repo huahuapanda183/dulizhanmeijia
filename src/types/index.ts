@@ -1,4 +1,4 @@
-// Content models for the Glamnetic homepage clone
+// Content models for the LynxiGlam homepage clone
 
 export interface NavItem {
   label: string;

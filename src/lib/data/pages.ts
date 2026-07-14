@@ -5,13 +5,13 @@ import type { Page } from "@/lib/data/types";
 export const PAGES: Page[] = [
   {
     slug: "about",
-    title: "About Glamnetic",
+    title: "About LynxiGlam",
     subtitle: "Salon-worthy nails and lashes, minus the salon.",
     sections: [
       {
         heading: "Our Story",
         body: [
-          "Glamnetic started with one stubborn idea: getting a flawless set of lashes or nails shouldn't cost you an afternoon or a fortune. What began as a search for a magnetic lash that actually held led us to reinvent at-home beauty from the ground up.",
+          "LynxiGlam started with one stubborn idea: getting a flawless set of lashes or nails shouldn't cost you an afternoon or a fortune. What began as a search for a magnetic lash that actually held led us to reinvent at-home beauty from the ground up.",
           "Today we design press-on nails, magnetic lashes, and quick-press manicures that go on in minutes, wear for weeks, and look like you just left the chair. No appointments, no glue disasters, no compromise.",
         ],
       },
@@ -25,7 +25,7 @@ export const PAGES: Page[] = [
       {
         heading: "Made For Everyone",
         body: [
-          "From a first-timer nervous about their first press-on to the pro who changes their set every week, Glamnetic is built to fit real life. Hundreds of shapes, lengths, and styles mean there's a look for every mood.",
+          "From a first-timer nervous about their first press-on to the pro who changes their set every week, LynxiGlam is built to fit real life. Hundreds of shapes, lengths, and styles mean there's a look for every mood.",
         ],
       },
     ],
@@ -118,8 +118,8 @@ export const PAGES: Page[] = [
     faq: [
       { q: "How do I contact support?", a: "Use the contact form in the Help Center with your order number. We reply within one business day, Monday–Friday." },
       { q: "Where's my order?", a: "Visit Track My Order and enter your order number and email to see live status, or check the tracking link in your shipping email." },
-      { q: "Do you offer discounts?", a: "Yes — join Glamnetic Rewards and the Insider Plus membership for credits, early access, and members-only pricing." },
-      { q: "Are your products cruelty-free?", a: "Absolutely. Every Glamnetic product is certified cruelty-free by Leaping Bunny." },
+      { q: "Do you offer discounts?", a: "Yes — join LynxiGlam Rewards and the Insider Plus membership for credits, early access, and members-only pricing." },
+      { q: "Are your products cruelty-free?", a: "Absolutely. Every LynxiGlam product is certified cruelty-free by Leaping Bunny." },
     ],
   },
   {
@@ -130,7 +130,7 @@ export const PAGES: Page[] = [
       {
         heading: "Find Your Tracking",
         body: [
-          "Every order ships with a tracking number sent to the email you used at checkout. Look for a message with the subject line \"Your Glamnetic order is on the way\" and tap the tracking link inside.",
+          "Every order ships with a tracking number sent to the email you used at checkout. Look for a message with the subject line \"Your LynxiGlam order is on the way\" and tap the tracking link inside.",
           "If you created an account, you can also view live status anytime under Order History in your account dashboard.",
         ],
       },
@@ -145,12 +145,12 @@ export const PAGES: Page[] = [
   {
     slug: "store-locator",
     title: "Store Locator",
-    subtitle: "Find Glamnetic on shelves near you.",
+    subtitle: "Find LynxiGlam on shelves near you.",
     sections: [
       {
         heading: "Where To Buy",
         body: [
-          "Beyond glamnetic.com, you can shop select Glamnetic favorites at major beauty retailers nationwide, including Ulta Beauty, Sephora, and Ulta Beauty at Target.",
+          "Beyond glamnetic.com, you can shop select LynxiGlam favorites at major beauty retailers nationwide, including Ulta Beauty, Sephora, and Ulta Beauty at Target.",
           "Availability varies by location and season, so we recommend calling ahead to confirm your favorite style is in stock.",
         ],
       },
@@ -164,13 +164,13 @@ export const PAGES: Page[] = [
   },
   {
     slug: "loyalty",
-    title: "Glamnetic Rewards",
+    title: "LynxiGlam Rewards",
     subtitle: "Earn points every time you glam.",
     sections: [
       {
         heading: "How It Works",
         body: [
-          "Join Glamnetic Rewards for free and start earning points on every purchase, review, and referral. Points add up fast and convert straight into store credit at checkout.",
+          "Join LynxiGlam Rewards for free and start earning points on every purchase, review, and referral. Points add up fast and convert straight into store credit at checkout.",
           "Create an account or log in, and your points balance follows you across every order.",
         ],
       },
@@ -190,7 +190,7 @@ export const PAGES: Page[] = [
   },
   {
     slug: "membership",
-    title: "Glamnetic Insider Plus",
+    title: "LynxiGlam Insider Plus",
     subtitle: "Our members-only club for serious glam.",
     sections: [
       {
@@ -217,7 +217,7 @@ export const PAGES: Page[] = [
   {
     slug: "glamfam",
     title: "VIP GlamFam Group",
-    subtitle: "Where the Glamnetic community lives.",
+    subtitle: "Where the LynxiGlam community lives.",
     sections: [
       {
         heading: "Join The GlamFam",
@@ -237,10 +237,10 @@ export const PAGES: Page[] = [
   {
     slug: "wholesale",
     title: "Wholesale & Partnerships",
-    subtitle: "Bring Glamnetic to your shelves.",
+    subtitle: "Bring LynxiGlam to your shelves.",
     sections: [
       {
-        heading: "Stock Glamnetic",
+        heading: "Stock LynxiGlam",
         body: [
           "We partner with salons, boutiques, and beauty retailers who want to offer their customers salon-quality press-ons and magnetic lashes. Our wholesale program includes competitive pricing, marketing support, and a curated best-seller assortment.",
         ],
@@ -254,7 +254,7 @@ export const PAGES: Page[] = [
       {
         heading: "Apply To Partner",
         body: [
-          "Ready to carry Glamnetic? Submit a wholesale inquiry with your business details and our partnerships team will follow up within 3–5 business days.",
+          "Ready to carry LynxiGlam? Submit a wholesale inquiry with your business details and our partnerships team will follow up within 3–5 business days.",
         ],
       },
     ],
@@ -358,7 +358,7 @@ export const PAGES: Page[] = [
   {
     slug: "terms",
     title: "Terms of Service",
-    subtitle: "The fine print for using Glamnetic.",
+    subtitle: "The fine print for using LynxiGlam.",
     sections: [
       {
         heading: "Agreement To Terms",
@@ -376,13 +376,13 @@ export const PAGES: Page[] = [
       {
         heading: "Intellectual Property",
         body: [
-          "All content on this site — including logos, imagery, product designs, and copy — is the property of Glamnetic and protected by applicable intellectual property laws. You may not reproduce or reuse it without written permission.",
+          "All content on this site — including logos, imagery, product designs, and copy — is the property of LynxiGlam and protected by applicable intellectual property laws. You may not reproduce or reuse it without written permission.",
         ],
       },
       {
         heading: "Limitation Of Liability",
         body: [
-          "Glamnetic is not liable for any indirect or incidental damages arising from the use of our products or site. Our products are intended for cosmetic use only; discontinue use if irritation occurs.",
+          "LynxiGlam is not liable for any indirect or incidental damages arising from the use of our products or site. Our products are intended for cosmetic use only; discontinue use if irritation occurs.",
         ],
       },
     ],

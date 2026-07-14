@@ -6,7 +6,7 @@ import { VerifiedIcon } from "@/components/icons";
 import { getReviews, getReviewSummary } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 
-export const metadata = { title: "Reviews | Glamnetic" };
+export const metadata = { title: "Reviews | LynxiGlam" };
 
 export default async function ReviewsPage() {
   const [reviews, summary] = await Promise.all([getReviews(), getReviewSummary()]);

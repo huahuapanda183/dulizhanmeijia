@@ -3,6 +3,7 @@ import { VerifiedIcon } from "@/components/icons";
 import { Stars } from "@/components/Stars";
 import { getReviews } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
+import { T } from "@/lib/i18n/i18n-context";
 
 export async function Reviews() {
   const reviews = await getReviews();
@@ -11,7 +12,7 @@ export async function Reviews() {
     <section className="w-full bg-cream py-12 md:py-16">
       <div className="mx-auto max-w-[1500px] px-4 md:px-8">
         <h2 className="heading-track mb-8 text-center text-[30px] font-medium text-ink md:mb-10 md:text-[38px]">
-          Our Reviews
+          <T k="Our Reviews" />
         </h2>
         <CarouselRail ariaLabel="Reviews">
           {reviews.map((review) => (

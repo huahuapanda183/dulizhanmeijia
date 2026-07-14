@@ -3,7 +3,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { AuthForm } from "@/components/AuthForm";
 
-export const metadata = { title: "Sign In | Glamnetic" };
+export const metadata = { title: "Sign In | LynxiGlam" };
 
 export default function LoginPage() {
   return (

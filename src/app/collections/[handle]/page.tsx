@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Pick<Params, "params">) {
   const { handle } = await params;
   const collection = await getCollection(handle);
   return {
-    title: collection ? `${collection.title} | Glamnetic` : "Collection | Glamnetic",
+    title: collection ? `${collection.title} | LynxiGlam` : "Collection | LynxiGlam",
   };
 }
 

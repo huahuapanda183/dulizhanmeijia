@@ -17,7 +17,7 @@ function arrayOf(v: string | string[] | undefined): string[] {
   return Array.isArray(v) ? v : v ? [v] : [];
 }
 
-export const metadata = { title: "Search | Glamnetic" };
+export const metadata = { title: "Search | LynxiGlam" };
 
 export default async function SearchPage({ searchParams }: Params) {
   const sp = await searchParams;

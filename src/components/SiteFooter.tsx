@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { GlamneticLogo } from "@/components/icons";
+import { LynxiGlamLogo } from "@/components/icons";
 import { NewsletterForm } from "@/components/NewsletterForm";
 import { FOOTER_COLUMNS } from "@/lib/data/content";
+import { T } from "@/lib/i18n/i18n-context";
 
 const legalLinks = [
   { label: "Returns & Refunds", href: "/pages/returns" },
@@ -13,11 +14,11 @@ export function SiteFooter() {
   return (
     <footer className="w-full bg-cream text-ink">
       <div className="mx-auto grid max-w-[1500px] grid-cols-1 gap-10 px-6 py-14 md:grid-cols-4 md:px-10">
-        {/* Column 1 — Glamnetic VIP */}
+        {/* Column 1 — LynxiGlam VIP */}
         <div>
-          <h3 className="mb-3 text-[20px] text-ink">Glamnetic VIP</h3>
+          <h3 className="mb-3 text-[20px] text-ink"><T k="LynxiGlam VIP" /></h3>
           <p className="mb-6 text-[14px] text-body">
-            Sign up for emails and texts to be the first to know about exclusive deals, launches &amp; more!
+            <T k="Sign up for emails and texts to be the first to know about exclusive deals, launches & more!" />
           </p>
           <NewsletterForm />
         </div>
@@ -25,7 +26,7 @@ export function SiteFooter() {
         {/* Columns 2–4 — link groups from content */}
         {FOOTER_COLUMNS.map((col) => (
           <div key={col.title}>
-            <h3 className="mb-4 text-[18px] text-ink">{col.title}</h3>
+            <h3 className="mb-4 text-[18px] text-ink"><T k={col.title} /></h3>
             <ul>
               {col.links.map((link) => (
                 <li key={link.label}>
@@ -62,7 +63,7 @@ export function SiteFooter() {
       {/* Bottom legal bar */}
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1500px] flex-col gap-4 px-6 py-6 md:flex-row md:items-center md:justify-between md:px-10">
-          <GlamneticLogo className="text-[22px] text-ink" />
+          <LynxiGlamLogo className="text-[22px] text-ink" />
           <div className="flex gap-6">
             {legalLinks.map((link) => (
               <Link key={link.label} href={link.href} className="text-[13px] text-body hover:text-ink">
@@ -70,7 +71,7 @@ export function SiteFooter() {
               </Link>
             ))}
           </div>
-          <span className="text-[12px] text-body">© 2026 Glamnetic</span>
+          <span className="text-[12px] text-body">© 2026 LynxiGlam</span>
         </div>
       </div>
     </footer>

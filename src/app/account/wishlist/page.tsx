@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { WishlistGrid } from "@/components/WishlistGrid";
 
-export const metadata: Metadata = { title: "Your Wishlist | Glamnetic" };
+export const metadata: Metadata = { title: "Your Wishlist | LynxiGlam" };
 
 export default function WishlistPage() {
   return (

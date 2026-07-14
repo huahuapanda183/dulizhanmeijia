@@ -5,7 +5,7 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { BundleBuilder } from "@/components/BundleBuilder";
 import { getProducts } from "@/lib/api";
 
-export const metadata: Metadata = { title: "Build Your Own Nail Bundle | Glamnetic" };
+export const metadata: Metadata = { title: "Build Your Own Nail Bundle | LynxiGlam" };
 
 export default async function BuildYourOwnBundlePage() {
   const products = await getProducts({ collection: "all-nails" });

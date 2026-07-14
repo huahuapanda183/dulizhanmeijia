@@ -16,7 +16,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { handle } = await params;
   const post = await getBlogPost(handle);
-  return { title: post ? `${post.title} | Glamnetic` : "Blog | Glamnetic" };
+  return { title: post ? `${post.title} | LynxiGlam` : "Blog | LynxiGlam" };
 }
 
 export default async function BlogPostPage({ params }: Params) {

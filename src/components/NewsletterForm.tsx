@@ -77,7 +77,7 @@ export function NewsletterForm() {
         />
         <p className="text-[11px] leading-relaxed text-body italic">
           By submitting this form, you agree to receive recurring automated promotional and
-          personalized marketing text messages (e.g. cart reminders) from Glamnetic at the cell
+          personalized marketing text messages (e.g. cart reminders) from LynxiGlam at the cell
           number used when signing up. Consent is not a condition of any purchase. Reply HELP for
           help and STOP to cancel. Msg frequency varies. Msg &amp; data rates may apply. View{" "}
           <Link href="/pages/terms" className="underline">

@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const page = await getPage(slug);
   return {
-    title: page ? `${page.title} | Glamnetic` : "Glamnetic",
+    title: page ? `${page.title} | LynxiGlam` : "LynxiGlam",
   };
 }
 

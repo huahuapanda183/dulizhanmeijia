@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
+import { useI18n } from "@/lib/i18n/i18n-context";
 import { formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { CloseIcon, MinusIcon, PlusIcon, BagIcon } from "@/components/icons";
@@ -9,6 +10,7 @@ import { FreeShippingBar } from "@/components/FreeShippingBar";
 
 export function CartDrawer() {
   const { lines, subtotal, itemCount, currency, isOpen, closeCart, updateQuantity, removeItem } = useCart();
+  const { t } = useI18n();
 
   return (
     <>
@@ -33,7 +35,7 @@ export function CartDrawer() {
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 className="text-[15px] font-semibold uppercase tracking-[0.12em] text-ink">
-            Your Bag ({itemCount})
+            {t("Your Bag")} ({itemCount})
           </h2>
           <button type="button" aria-label="Close" onClick={closeCart} className="text-ink">
             <CloseIcon className="h-5 w-5" />
@@ -43,13 +45,13 @@ export function CartDrawer() {
         {lines.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
             <BagIcon className="h-10 w-10 text-body" />
-            <p className="text-[16px] text-ink">Your bag is empty</p>
+            <p className="text-[16px] text-ink">{t("Your bag is empty")}</p>
             <Link
               href="/collections/all"
               onClick={closeCart}
               className="mt-2 bg-mauve px-8 py-3 text-[13px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-mauve-dark"
             >
-              Shop All
+              {t("Shop All")}
             </Link>
           </div>
         ) : (
@@ -95,23 +97,23 @@ export function CartDrawer() {
 
             <div className="border-t border-line px-5 py-4">
               <div className="flex items-center justify-between text-[15px]">
-                <span className="text-ink">Subtotal</span>
+                <span className="text-ink">{t("Subtotal")}</span>
                 <span className="font-medium text-ink">{formatPrice(subtotal, currency)}</span>
               </div>
-              <p className="mt-1 text-[12px] text-body">Shipping &amp; taxes calculated at checkout.</p>
+              <p className="mt-1 text-[12px] text-body">{t("Shipping & taxes calculated at checkout.")}</p>
               <Link
                 href="/checkout"
                 onClick={closeCart}
                 className="mt-4 block w-full rounded-sm bg-ink-2 py-3.5 text-center text-[14px] font-semibold uppercase tracking-[0.12em] text-white transition-colors hover:bg-ink"
               >
-                Checkout
+                {t("Checkout")}
               </Link>
               <Link
                 href="/cart"
                 onClick={closeCart}
                 className="mt-2 block w-full py-2 text-center text-[13px] text-ink underline underline-offset-4"
               >
-                View Bag
+                {t("View Bag")}
               </Link>
             </div>
           </>

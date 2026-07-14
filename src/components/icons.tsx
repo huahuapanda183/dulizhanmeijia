@@ -216,15 +216,15 @@ export function YoutubeIcon(props: IconProps) {
   );
 }
 
-/** Glamnetic wordmark — "GLAM" bold + "NETIC" light. */
-export function GlamneticLogo({ className }: { className?: string }) {
+/** LynxiGlam wordmark — "GLAM" bold + "NETIC" light. */
+export function LynxiGlamLogo({ className }: { className?: string }) {
   return (
     <span
       className={className}
       style={{ fontFamily: "var(--font-sofia), sans-serif", letterSpacing: "0.02em", whiteSpace: "nowrap" }}
     >
-      <span style={{ fontWeight: 800 }}>GLAM</span>
-      <span style={{ fontWeight: 300 }}>NETIC</span>
+      <span style={{ fontWeight: 800 }}>Lynxi</span>
+      <span style={{ fontWeight: 300 }}>Glam</span>
     </span>
   );
 }

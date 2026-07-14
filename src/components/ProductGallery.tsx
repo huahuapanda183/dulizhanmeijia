@@ -11,7 +11,7 @@ interface ProductGalleryProps {
 
 /**
  * PDP gallery: large main image with a thumbnail strip below.
- * Hovering the main image plays a muted looping product video (real Glamnetic behavior).
+ * Hovering the main image plays a muted looping product video (real LynxiGlam behavior).
  */
 export function ProductGallery({ images, video, name }: ProductGalleryProps) {
   const [active, setActive] = useState(0);

@@ -27,14 +27,14 @@ export const ANNOUNCEMENTS = [
 export const HERO_SLIDES: HeroSlide[] = [
   { desktop: "2026_07_FreeUSShipping_HP_Desktop_copy.webp", mobile: "2026_07_FreeUSShipping_HP_Mobile_copy.webp", alt: "Score free U.S. economy shipping", href: "/collections/all" },
   { desktop: "2026_06_GlamIcons_HP_Desktop_1.webp", mobile: "2026_06_GlamIcons_HP_Mobile_3.webp", alt: "Glam Icons collection", href: "/collections/new" },
-  { desktop: "2026_06_Glamzilla_HP_Desktop.webp", mobile: "2026_06_Glamzilla_HP_Mobile.webp", alt: "Glamnetic x Glamzilla", href: "/collections/all-nails" },
+  { desktop: "2026_06_Glamzilla_HP_Desktop.webp", mobile: "2026_06_Glamzilla_HP_Mobile.webp", alt: "LynxiGlam x Glamzilla", href: "/collections/all-nails" },
   { desktop: "2026_06_SandalSeason_HP_Desktop.webp", mobile: "2026_06_SandalSeason_HP_Mobile.webp", alt: "Sandal season collection", href: "/collections/all-nails" },
   { desktop: "2026_07_SparklingGems_HP_DesktopGeneral.webp", mobile: "2026_07_SparklingGems_HP_MobileGeneral.webp", alt: "Sparkling gems collection", href: "/collections/sparkling-gems" },
 ];
 
 export const CATEGORY_CARDS: OverlayCard[] = [
   { label: "Shop Glue On Nails", image: "Shop_Nails.png", href: "/collections/all-nails" },
-  { label: "Shop Quick Press Mani", image: "Glamnetic_QuickPressMani_Homepage_CategoryModule.webp", href: "/collections/quick-press-mani" },
+  { label: "Shop Quick Press Mani", image: "LynxiGlam_QuickPressMani_Homepage_CategoryModule.webp", href: "/collections/quick-press-mani" },
   { label: "Shop Accessories", image: "SHOP_ACCESSORIE.png", href: "/collections/accessories" },
   { label: "Shop Lashes", image: "Shop_Lashes.png", href: "/collections/all-lashes" },
 ];
@@ -44,7 +44,7 @@ export const PROMO_CARDS: OverlayCard[] = [
   { label: "New: Sparkling Gems", image: "2026_07_SparklingGems_HPWidgetGeneral.webp", href: "/collections/sparkling-gems" },
   { label: "NEW: Sandal Season Collection", image: "2026_06_SandalSeason_HPWidget.webp", href: "/collections/all-nails" },
   { label: "NEW STYLES ADDED: Glam Icons", image: "2026_06_GlamIcons_HPWidget.webp", href: "/collections/new" },
-  { label: "GLAMNETIC X GLAMZILLA", image: "2026_05_Glamzilla_HPWidget_US.webp", href: "/collections/all-nails" },
+  { label: "LYNXIGLAM X GLAMZILLA", image: "2026_05_Glamzilla_HPWidget_US.webp", href: "/collections/all-nails" },
 ];
 
 export const FEATURE_CARDS: OverlayCard[] = [

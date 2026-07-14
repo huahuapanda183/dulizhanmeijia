@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { getNavigation } from "@/lib/api";
-import { GlamneticLogo, ChevronDownIcon } from "@/components/icons";
+import { LynxiGlamLogo, ChevronDownIcon } from "@/components/icons";
 import { HeaderActions } from "@/components/HeaderActions";
 import { MobileMenu } from "@/components/MobileMenu";
+import { T } from "@/lib/i18n/i18n-context";
 
 export async function SiteHeader() {
   const nav = await getNavigation();
@@ -15,8 +16,8 @@ export async function SiteHeader() {
           <MobileMenu nav={nav} />
         </div>
 
-        <Link href="/" aria-label="Glamnetic home" className="justify-self-center">
-          <GlamneticLogo className="text-[26px] text-ink md:text-[30px]" />
+        <Link href="/" aria-label="LynxiGlam home" className="justify-self-center">
+          <LynxiGlamLogo className="text-[26px] text-ink md:text-[30px]" />
         </Link>
 
         <HeaderActions />
@@ -31,7 +32,7 @@ export async function SiteHeader() {
                 href={item.href}
                 className="flex items-center gap-1 py-3.5 text-[13px] font-medium uppercase tracking-[0.08em] text-ink transition-colors hover:text-mauve"
               >
-                {item.label}
+                <T k={item.label} />
                 {item.columns && <ChevronDownIcon className="h-3 w-3" />}
               </Link>
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
 import { ANNOUNCEMENTS as MESSAGES } from "@/lib/data/content";
+import { useI18n } from "@/lib/i18n/i18n-context";
 
 function useCountdown() {
   const [label, setLabel] = useState("");
@@ -27,6 +28,7 @@ function useCountdown() {
 export function AnnouncementBar() {
   const [i, setI] = useState(0);
   const countdown = useCountdown();
+  const { t } = useI18n();
   const move = (d: number) => setI((v) => (v + d + MESSAGES.length) % MESSAGES.length);
 
   return (
@@ -36,7 +38,7 @@ export function AnnouncementBar() {
           <ChevronLeftIcon className="h-4 w-4" />
         </button>
         <p className="flex items-center gap-2 text-center text-[11px] font-medium uppercase tracking-[0.14em] sm:text-xs">
-          {MESSAGES[i]}
+          {t(MESSAGES[i])}
           {i === 0 && <span className="tabular-nums opacity-90">{countdown}</span>}
         </p>
         <button type="button" aria-label="Next offer" onClick={() => move(1)} className="p-1">

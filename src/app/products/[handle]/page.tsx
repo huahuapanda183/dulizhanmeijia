@@ -23,7 +23,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { handle } = await params;
   const p = await getProduct(handle);
-  return { title: p ? `${p.title} | Glamnetic` : "Product | Glamnetic" };
+  return { title: p ? `${p.title} | LynxiGlam` : "Product | LynxiGlam" };
 }
 
 const FEATURE_ICONS = { clock: ClockIcon, calendar: CalendarIcon, salon: SalonIcon, bunny: BunnyIcon };
@@ -95,10 +95,10 @@ export default async function ProductPage({ params }: Params) {
 
               <div className="mt-8 rounded-md border border-line bg-white p-6">
                 <div className="flex items-start gap-4">
-                  <GlamneticMark className="h-14 w-14 shrink-0 text-ink" />
+                  <LynxiGlamMark className="h-14 w-14 shrink-0 text-ink" />
                   <div className="flex-1">
                     <h2 className="text-[15px] font-bold uppercase tracking-[0.04em] text-ink">
-                      Join Glamnetic Insider Plus Membership
+                      Join LynxiGlam Insider Plus Membership
                     </h2>
                     <ul className="mt-3 space-y-1.5">
                       {MEMBERSHIP_PERKS.map((perk) => (
@@ -137,7 +137,7 @@ export default async function ProductPage({ params }: Params) {
   );
 }
 
-function GlamneticMark({ className }: { className?: string }) {
+function LynxiGlamMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden>
       <path d="M30 16a10 10 0 1 0 3 9h-8" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" />

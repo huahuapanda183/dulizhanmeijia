@@ -5,7 +5,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getBlogPosts } from "@/lib/api";
 
-export const metadata: Metadata = { title: "Blog | Glamnetic" };
+export const metadata: Metadata = { title: "Blog | LynxiGlam" };
 
 export default async function BlogPage() {
   const posts = await getBlogPosts();

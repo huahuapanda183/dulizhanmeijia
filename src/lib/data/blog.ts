@@ -9,7 +9,7 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "A few small habits at application are the difference between three days and three weeks of flawless wear.",
     image: "CitrusCoast_1.webp",
-    author: "Team Glamnetic",
+    author: "Team LynxiGlam",
     date: "2026-06-20",
     body: [
       "The single biggest factor in press-on longevity happens before you ever pick up the glue: prep. Push back your cuticles, lightly buff the shine off your natural nail, and wipe each nail with an alcohol pad. Oils are the enemy of adhesion, so this quick degrease removes the invisible layer that causes lifting on day two.",
@@ -24,7 +24,7 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "From citrus-bright tips to milky chrome, these are the manicures defining the season.",
     image: "SaltyWaves_1.webp",
-    author: "Team Glamnetic",
+    author: "Team LynxiGlam",
     date: "2026-06-12",
     body: [
       "Summer is the season to be bold, and this year the trends are leaning playful, glossy, and unapologetically fun. If your winter sets skewed neutral, consider this your permission slip to experiment. Here are the five looks we cannot stop reaching for.",
@@ -39,7 +39,7 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "No glue, no waiting to dry, no mess — here's everything you need to master magnetic lashes on your first try.",
     image: "Magnetic_Lashes.jpg",
-    author: "Team Glamnetic",
+    author: "Team LynxiGlam",
     date: "2026-05-28",
     body: [
       "Magnetic lashes swap messy adhesive for a magnetic eyeliner that your lashes snap onto — no drying time, no fumbling, and no stinging glue near your eyes. If you have avoided falsies because application felt intimidating, this system was built for you.",
@@ -50,11 +50,11 @@ export const BLOG_POSTS: BlogPost[] = [
   },
   {
     handle: "guide-to-nail-shapes",
-    title: "The Glamnetic Guide to Nail Shapes",
+    title: "The LynxiGlam Guide to Nail Shapes",
     excerpt:
       "Almond, coffin, square, or round — here's how to choose the shape that flatters your hands and fits your lifestyle.",
     image: "LaPerle_1.webp",
-    author: "Team Glamnetic",
+    author: "Team LynxiGlam",
     date: "2026-05-15",
     body: [
       "The right nail shape can lengthen your fingers, complement your natural nail bed, and hold up to your daily routine. With so many options it helps to understand what each shape actually does before you commit to a set.",
@@ -69,7 +69,7 @@ export const BLOG_POSTS: BlogPost[] = [
     excerpt:
       "Never peel them off — this gentle soak-off method keeps your natural nails strong and healthy between sets.",
     image: "AperitivoHour_1.webp",
-    author: "Team Glamnetic",
+    author: "Team LynxiGlam",
     date: "2026-05-02",
     body: [
       "We get it — at the end of a long wear it is tempting to just pick at a lifting edge and pull. Please don't. Peeling press-ons off dry takes layers of your natural nail with them, leaving your beds thin, weak, and sensitive. The good news is a proper removal takes about fifteen minutes and keeps your nails intact.",

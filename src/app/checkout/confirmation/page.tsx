@@ -4,7 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { OrderConfirmation } from "@/components/OrderConfirmation";
 
-export const metadata: Metadata = { title: "Order Confirmed | Glamnetic" };
+export const metadata: Metadata = { title: "Order Confirmed | LynxiGlam" };
 
 export default function ConfirmationPage() {
   return (
