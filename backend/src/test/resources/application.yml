@@ -1,0 +1,33 @@
+spring:
+  # This file shadows the main application.yml on the test classpath, so any
+  # runtime setting the tests rely on must be repeated here (e.g. Jackson inclusion).
+  jackson:
+    default-property-inclusion: non_null
+  datasource:
+    url: jdbc:h2:mem:lynxiglam_test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;NON_KEYWORDS=VALUE,DAY;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+  flyway:
+    enabled: false
+  # Schema + seed are (re)loaded per test by AbstractIntegrationTest for isolation.
+  sql:
+    init:
+      mode: never
+
+server:
+  servlet:
+    context-path: /api
+
+app:
+  storefront-origin: http://localhost:3000
+  security:
+    session-cookie-name: lynxiglam_session
+    admin-cookie-name: lynxiglam_admin_session
+  commerce:
+    free-shipping-threshold-cents: 6500
+    tax-rate: 0.0725
