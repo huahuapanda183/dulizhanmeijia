@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  frontend:
+    name: Frontend (lint + typecheck + build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # Build against the mock data source so CI stays green without a backend.
+      # NEXT_PUBLIC_* is inlined at build time, so it must be set here explicitly.
+      - run: npm run check
+        env:
+          NEXT_PUBLIC_DATA_SOURCE: mock
+
+  backend:
+    name: Backend (45 tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      # Tests run on in-memory H2 via MockMvc — no database or open port needed.
+      - run: ./mvnw --batch-mode test
+        working-directory: backend
