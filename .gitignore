@@ -1,5 +1,6 @@
 # Dependencies
 node_modules/
+.tools/
 .pnp
 .pnp.js
 
@@ -8,6 +9,7 @@ node_modules/
 out/
 build/
 dist/
+backend/target/
 
 # Environment
 .env
@@ -15,6 +17,7 @@ dist/
 .env.development.local
 .env.test.local
 .env.production.local
+backend/src/main/resources/application-local.yml
 
 # Debug
 npm-debug.log*
