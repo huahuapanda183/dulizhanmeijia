@@ -1,6 +1,9 @@
 import type { Product, ProductQuery, ProductFacets, SortKey, FacetValue } from "@/lib/data/types";
 import { PRODUCTS } from "@/lib/data/catalog";
-import { apiFetch, usingMock } from "./config";
+import { ApiError, apiFetch, usingMock } from "./config";
+
+/** Backend `/products/facets` only scopes by collection + search (see CatalogService). */
+type FacetQuery = Pick<ProductQuery, "collection" | "search">;
 
 function sortProducts(list: Product[], sort: SortKey = "featured"): Product[] {
   const out = [...list];
@@ -66,10 +69,12 @@ export async function getProducts(query: ProductQuery = {}): Promise<Product[]> 
  * Facet counts are computed against the collection/search filter only (not the
  * currently-selected shape/tag/price), so users can widen their selection.
  */
-export async function getProductFacets(query: ProductQuery = {}): Promise<ProductFacets> {
+export async function getProductFacets(query: FacetQuery = {}): Promise<ProductFacets> {
   if (!usingMock()) {
+    // Only forward the scope the backend supports; other filters don't shape facet counts.
+    const facetParams: FacetQuery = { collection: query.collection, search: query.search };
     const qs = new URLSearchParams(
-      Object.entries(query).flatMap(([k, v]) => (v == null ? [] : [[k, String(v)]])) as [string, string][],
+      Object.entries(facetParams).flatMap(([k, v]) => (v == null ? [] : [[k, String(v)]])) as [string, string][],
     ).toString();
     return apiFetch<ProductFacets>(`/products/facets?${qs}`);
   }
@@ -99,8 +104,9 @@ export async function getProduct(handle: string): Promise<Product | null> {
   if (!usingMock()) {
     try {
       return await apiFetch<Product>(`/products/${handle}`);
-    } catch {
-      return null;
+    } catch (error) {
+      if (error instanceof ApiError && error.isNotFound) return null;
+      throw error; // don't mask 5xx / network errors as "not found"
     }
   }
   return PRODUCTS.find((p) => p.handle === handle) ?? null;

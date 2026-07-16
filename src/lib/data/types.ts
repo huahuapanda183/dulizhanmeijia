@@ -204,6 +204,8 @@ export interface OrderInput {
   shippingAddress: Address;
   shippingRateId: string;
   promoCode?: string;
+  /** Stable per checkout submission; the backend returns the existing order on retry. */
+  idempotencyKey: string;
 }
 
 export interface Order {

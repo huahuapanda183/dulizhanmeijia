@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
@@ -45,6 +45,7 @@ export function CheckoutForm() {
   const router = useRouter();
   const { t } = useI18n();
   const { lines, subtotal, currency, clear } = useCart();
+  const idempotencyKey = useRef(crypto.randomUUID());
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [rates, setRates] = useState<ShippingRate[]>([]);
@@ -130,6 +131,7 @@ export function CheckoutForm() {
         shippingAddress,
         shippingRateId: selectedRate.id,
         promoCode: promo?.ok ? promo.code : undefined,
+        idempotencyKey: idempotencyKey.current,
       });
       sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
       clear();

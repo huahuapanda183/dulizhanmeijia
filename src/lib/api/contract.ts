@@ -37,7 +37,8 @@ export interface StoreApi {
   getProducts(query?: ProductQuery): Promise<Product[]>;
   getProduct(handle: string): Promise<Product | null>;
   getProductsByHandles(handles: string[]): Promise<Product[]>;
-  getProductFacets(query?: ProductQuery): Promise<ProductFacets>;
+  /** Facets are scoped by collection/search only — other filters don't shape counts. */
+  getProductFacets(query?: Pick<ProductQuery, "collection" | "search">): Promise<ProductFacets>;
   getRecommendations(handle: string, limit?: number): Promise<Product[]>;
   searchProducts(term: string): Promise<Product[]>;
   getAllProductHandles(): Promise<string[]>;

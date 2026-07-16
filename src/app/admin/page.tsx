@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getProducts, getCollections } from "@/lib/api";
 import { formatPrice, formatCount } from "@/lib/format";
 import { AnalyticsOverview } from "@/components/admin/AnalyticsOverview";
+import { AdminGate } from "@/components/admin/AdminGate";
 import { T } from "@/lib/i18n/i18n-context";
 
 function StatCard({ label, value }: { label: string; value: string }) {
@@ -45,9 +46,11 @@ export default async function AdminDashboardPage() {
         <StatCard label="Revenue (demo)" value={formatPrice(revenue, currency)} />
       </div>
 
-      {/* Analytics overview */}
+      {/* Analytics overview (admin-only; gated in api mode) */}
       <div className="mt-8">
-        <AnalyticsOverview />
+        <AdminGate>
+          <AnalyticsOverview />
+        </AdminGate>
       </div>
 
       {/* Recent products */}

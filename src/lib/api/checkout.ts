@@ -12,9 +12,17 @@ import { apiFetch, usingMock } from "./config";
 export const FREE_SHIPPING_THRESHOLD = 65;
 
 /** Available shipping options. Standard is free over the threshold. */
-export async function getShippingRates(subtotal = 0, _address?: Address): Promise<ShippingRate[]> {
-  if (!usingMock()) return apiFetch<ShippingRate[]>(`/checkout/shipping-rates?subtotal=${subtotal}`);
-  void _address;
+export async function getShippingRates(subtotal = 0, address?: Address): Promise<ShippingRate[]> {
+  if (!usingMock()) {
+    const params = new URLSearchParams({ subtotal: String(subtotal) });
+    // Destination is a reserved, backward-compatible extension point: rates are
+    // subtotal-only today, but forward country/state/zip so region-based rating
+    // can be added without changing callers.
+    if (address?.country) params.set("country", address.country);
+    if (address?.state) params.set("state", address.state);
+    if (address?.zip) params.set("zip", address.zip);
+    return apiFetch<ShippingRate[]>(`/checkout/shipping-rates?${params.toString()}`);
+  }
   const standard = subtotal >= FREE_SHIPPING_THRESHOLD ? 0 : 5.95;
   return [
     { id: "standard", label: "Standard (5–7 business days)", amount: standard, estimate: "5–7 business days" },
@@ -64,29 +72,31 @@ export async function createOrder(input: OrderInput): Promise<Order> {
     return apiFetch<Order>(`/orders`, { method: "POST", body: JSON.stringify(input) });
   }
 
-  const lines: CartLine[] = input.lines
-    .map((li) => {
-      const p = PRODUCTS.find((x) => x.handle === li.handle);
-      if (!p) return null;
-      return {
-        id: p.handle,
-        handle: p.handle,
-        title: p.title,
-        shape: p.shape,
-        image: p.images[0],
-        price: p.price,
-        currency: p.currency,
-        quantity: li.quantity,
-      } satisfies CartLine;
-    })
-    .filter((l): l is CartLine => Boolean(l));
+  // Match the backend's failure semantics: an unknown product 404s and an unknown
+  // shipping rate 400s server-side, so the mock must reject them too rather than
+  // silently dropping lines or falling back to a default rate.
+  const lines: CartLine[] = input.lines.map((li) => {
+    const p = PRODUCTS.find((x) => x.handle === li.handle);
+    if (!p) throw new Error(`Product is unavailable: ${li.handle}`);
+    return {
+      id: p.handle,
+      handle: p.handle,
+      title: p.title,
+      shape: p.shape,
+      image: p.images[0],
+      price: p.price,
+      currency: p.currency,
+      quantity: li.quantity,
+    } satisfies CartLine;
+  });
 
   const currency = lines[0]?.currency ?? "USD";
   const subtotal = lines.reduce((s, l) => s + l.price * l.quantity, 0);
 
   const rates = await getShippingRates(subtotal, input.shippingAddress);
-  const rate = rates.find((r) => r.id === input.shippingRateId) ?? rates[0];
-  let shipping = rate?.amount ?? 0;
+  const rate = rates.find((r) => r.id === input.shippingRateId);
+  if (!rate) throw new Error(`Unknown shipping rate: ${input.shippingRateId}`);
+  let shipping = rate.amount;
 
   let discount = 0;
   if (input.promoCode) {
@@ -101,8 +111,8 @@ export async function createOrder(input: OrderInput): Promise<Order> {
   const tax = +(taxable * TAX_RATE).toFixed(2);
   const total = +(taxable + shipping + tax).toFixed(2);
 
-  const stamp = input.email.length + lines.length; // deterministic-ish suffix
-  const number = `GN${100000 + subtotal.toFixed(0).length * 137 + stamp}`;
+  const stamp = input.idempotencyKey.replaceAll("-", "").slice(-8).toUpperCase();
+  const number = `LX${stamp}`;
 
   return {
     id: number.toLowerCase(),

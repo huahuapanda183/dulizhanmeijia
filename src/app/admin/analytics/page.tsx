@@ -1,5 +1,6 @@
 import { T } from "@/lib/i18n/i18n-context";
 import { AnalyticsView } from "@/components/admin/AnalyticsView";
+import { AdminGate } from "@/components/admin/AdminGate";
 
 export const metadata = { title: "Analytics | LynxiGlam Admin" };
 
@@ -14,7 +15,9 @@ export default function AdminAnalyticsPage() {
           <T k="Per-product views, clicks and add-to-cart." />
         </p>
       </header>
-      <AnalyticsView />
+      <AdminGate>
+        <AnalyticsView />
+      </AdminGate>
     </div>
   );
 }

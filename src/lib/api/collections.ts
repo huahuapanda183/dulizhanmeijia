@@ -1,7 +1,7 @@
 import type { Collection, NavItem } from "@/lib/data/types";
 import { COLLECTIONS, NAVIGATION } from "@/lib/data/collections";
 import { PRODUCTS } from "@/lib/data/catalog";
-import { apiFetch, usingMock } from "./config";
+import { ApiError, apiFetch, usingMock } from "./config";
 
 function withProducts(meta: Omit<Collection, "products">): Collection {
   return {
@@ -19,8 +19,9 @@ export async function getCollection(handle: string): Promise<Collection | null> 
   if (!usingMock()) {
     try {
       return await apiFetch<Collection>(`/collections/${handle}`);
-    } catch {
-      return null;
+    } catch (error) {
+      if (error instanceof ApiError && error.isNotFound) return null;
+      throw error;
     }
   }
   const meta = COLLECTIONS.find((c) => c.handle === handle);
