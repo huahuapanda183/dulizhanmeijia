@@ -1,0 +1,48 @@
+NOTICE — third-party material and license scope
+================================================
+
+The MIT license in LICENSE applies ONLY to the original source code in this
+repository (the Next.js application under src/, the Spring Boot application
+under backend/, and the scripts and documentation authored for this project).
+
+It does NOT apply to, and this project claims no rights in, the following:
+
+1. Images and video
+   The files under public/images/ and public/videos/ were downloaded from
+   glamnetic.com while using this repository to practice reverse-engineering a
+   storefront. They are the copyrighted property of Glamnetic and/or its
+   licensors, including product photography, user-generated content, and
+   imagery depicting identifiable models. They are included here solely as
+   placeholders for a non-commercial technical exercise. They are not
+   sublicensed by this repository and must be removed or replaced with owned or
+   licensed material before this project is published, deployed, or used for
+   any commercial purpose.
+
+2. Text content
+   Product names and descriptions, collection copy, marketing copy, blog posts,
+   informational/legal page text and reviews under src/lib/data/ and in the
+   Flyway seed (backend/src/main/resources/db/migration/V2__seed.sql) are
+   derived from glamnetic.com and are subject to the same restriction.
+
+3. Trademarks and brand identifiers
+   All third-party names, logos and marks referenced or rendered by this
+   application — including but not limited to Glamnetic, Ulta Beauty, Sephora,
+   Kohl's, Target, Harry Potter and Wizarding World (Warner Bros.), Shop Pay
+   (Shopify), Leaping Bunny (Cruelty Free International), and the publications
+   shown in the "As Seen On" section — are the property of their respective
+   owners. Their appearance here is an artifact of the cloning exercise and does
+   not indicate any affiliation, endorsement, sponsorship, stocking
+   relationship, certification, award, or license.
+
+4. Not genuine
+   Reviews, ratings, review counts, award badges, certification claims,
+   retailer availability, press coverage, membership offers and shipping and
+   returns policies rendered by this application are placeholder/sample data
+   invented for development. None of them are genuine and none should be relied
+   upon.
+
+Attribution
+-----------
+This project was bootstrapped from ai-website-clone-template by JCodesMore,
+used under the MIT license. The upstream copyright notice is retained in
+LICENSE.
