@@ -1,0 +1,49 @@
+spring:
+  application:
+    name: lynxiglam-store
+  profiles:
+    default: local
+  jackson:
+    default-property-inclusion: non_null
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+  flyway:
+    enabled: true
+
+server:
+  port: 8090
+  servlet:
+    context-path: /api
+    session:
+      cookie:
+        name: lynxiglam_session
+        http-only: true
+        same-site: lax
+  forward-headers-strategy: framework
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+app:
+  storefront-origin: ${STOREFRONT_ORIGIN:http://localhost:3000}
+  security:
+    session-cookie-name: lynxiglam_session
+    admin-cookie-name: lynxiglam_admin_session
+  commerce:
+    free-shipping-threshold-cents: 6500
+    tax-rate: 0.0725
