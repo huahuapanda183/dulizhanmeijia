@@ -57,7 +57,7 @@ cd backend
 ### 让前端连到后端
 
 ```bash
-cp .env.local.example .env.local     # NEXT_PUBLIC_DATA_SOURCE=api
+cp .env.example .env.local           # 然后设 NEXT_PUBLIC_DATA_SOURCE=api
 npm run dev
 ```
 
