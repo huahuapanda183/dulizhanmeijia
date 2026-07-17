@@ -50,3 +50,10 @@ next-env.d.ts
 
 # Local temp files
 temp/
+
+# Local-only operational docs — contain the shared host's topology (tenants,
+# ports, database names, resource limits). Needed locally to deploy; must never
+# be committed or published.
+docs/PROJECT_MEMORY.md
+docs/research/BACKEND_DEPLOYMENT_PLAN.md
+docs/research/BACKEND_IMPLEMENTATION_CHECKLIST.md
