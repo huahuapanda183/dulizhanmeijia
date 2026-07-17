@@ -1,6 +1,7 @@
 MIT License
 
 Copyright (c) 2025 JCodesMore
+Copyright (c) 2026 huahuapanda183
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,3 +20,19 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+授权范围说明 / Scope note
+
+以上 MIT 授权仅适用于本仓库的原创源代码。仓库中打包的第三方素材（图片、视频、
+文案与商标）不在此授权范围内，详见 NOTICE 文件。
+
+The MIT license above covers the original source code in this repository only.
+Third-party material bundled here (images, video, copy and trademarks) is NOT
+covered by it — see the NOTICE file.
+
+第一行版权归属上游模板 ai-website-clone-template（作者 JCodesMore），依 MIT 条款
+予以保留。
+The first copyright line is the upstream template (ai-website-clone-template by
+JCodesMore) and is retained as its MIT terms require.

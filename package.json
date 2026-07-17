@@ -1,27 +1,27 @@
 {
-  "name": "ai-website-clone-template",
-  "version": "0.3.1",
+  "name": "lynxiglam-storefront",
+  "version": "0.1.0",
   "private": true,
-  "description": "Clone any website into a clean, modern Next.js codebase using AI coding agents",
-  "author": "JCodesMore",
+  "description": "LynxiGlam — 全栈电商站点：Next.js 16 店铺前台与后台，背后是 Spring Boot 4 / Java 21 电商 API，两端通过同一份带类型的数据契约打通",
+  "author": "huahuapanda183",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template.git"
+    "url": "https://github.com/huahuapanda183/dulizhanmeijia.git"
   },
-  "homepage": "https://github.com/JCodesMore/ai-website-cloner-template",
+  "homepage": "https://github.com/huahuapanda183/dulizhanmeijia#readme",
   "bugs": {
-    "url": "https://github.com/JCodesMore/ai-website-cloner-template/issues"
+    "url": "https://github.com/huahuapanda183/dulizhanmeijia/issues"
   },
   "keywords": [
-    "claude-code",
-    "website-clone",
-    "reverse-engineering",
     "nextjs",
-    "ai",
-    "template",
-    "tailwindcss",
-    "shadcn-ui"
+    "react",
+    "typescript",
+    "spring-boot",
+    "java",
+    "ecommerce",
+    "storefront",
+    "tailwindcss"
   ],
   "engines": {
     "node": ">=24"
