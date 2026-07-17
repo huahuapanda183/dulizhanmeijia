@@ -13,6 +13,10 @@ import { MultiColumn } from "@/components/MultiColumn";
 import { Marquee } from "@/components/Marquee";
 import { SiteFooter } from "@/components/SiteFooter";
 
+/** Product prices/availability are rendered here (BestSellers, ShopAllPressOns),
+ *  so this page must not be frozen at build time in api mode. */
+export const revalidate = 0;
+
 export default function Home() {
   return (
     <>

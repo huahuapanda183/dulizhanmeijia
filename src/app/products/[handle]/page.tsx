@@ -17,6 +17,15 @@ import { T } from "@/lib/i18n/i18n-context";
 
 type Params = { params: Promise<{ handle: string }> };
 
+/**
+ * Re-render on each request. Without this the PDP is prerendered once at build
+ * and `initialRevalidateSeconds: false` freezes it forever: a price or
+ * availability change in the database would never reach this page, while
+ * checkout recomputes from live data — the customer would be charged a total the
+ * product page never showed.
+ */
+export const revalidate = 0;
+
 export async function generateStaticParams() {
   const handles = await getAllProductHandles();
   return handles.map((handle) => ({ handle }));

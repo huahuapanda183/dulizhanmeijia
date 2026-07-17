@@ -5,12 +5,22 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCart } from "@/lib/cart/cart-context";
 import { formatPrice } from "@/lib/format";
-import { getShippingRates, applyPromoCode, createOrder } from "@/lib/api";
+import { getShippingRates, applyPromoCode, createOrder, ApiError } from "@/lib/api";
 import { useI18n } from "@/lib/i18n/i18n-context";
 import type { Address, PromoResult, ShippingRate } from "@/lib/data/types";
 
-const TAX_RATE = 0.0725;
+/**
+ * Tax as basis points (725 = 7.25%). The backend computes tax on integer cents
+ * with HALF_UP rounding (common/Money.java); doing the same here in integer
+ * arithmetic keeps the displayed total identical to the charged total. Floating
+ * point would drift: 174.00 * 0.0725 is 12.6149999… in IEEE-754, which rounds to
+ * 12.61 while the server bills 12.62.
+ */
+const TAX_BASIS_POINTS = 725;
 const LAST_ORDER_KEY = "glamnetic-last-order";
+
+const toCents = (major: number) => Math.round(major * 100);
+const fromCents = (cents: number) => cents / 100;
 
 const inputClass =
   "w-full border border-line rounded-sm px-3 py-2.5 text-[14px] outline-none focus:border-mauve";
@@ -45,7 +55,21 @@ export function CheckoutForm() {
   const router = useRouter();
   const { t } = useI18n();
   const { lines, subtotal, currency, clear } = useCart();
+
+  // One idempotency key per (cart contents) submission attempt. It MUST rotate
+  // when the cart changes: the backend returns the stored order for a repeated
+  // key without comparing the payload, so reusing a key after an edit would
+  // return the *previous* cart's order.
+  const cartSignature = useMemo(
+    () => lines.map((l) => `${l.handle}:${l.quantity}`).join("|"),
+    [lines],
+  );
   const idempotencyKey = useRef(crypto.randomUUID());
+  const keyedFor = useRef(cartSignature);
+  if (keyedFor.current !== cartSignature) {
+    keyedFor.current = cartSignature;
+    idempotencyKey.current = crypto.randomUUID();
+  }
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [rates, setRates] = useState<ShippingRate[]>([]);
@@ -75,12 +99,31 @@ export function CheckoutForm() {
     [rates, selectedRateId],
   );
 
+  // A promo is validated against the subtotal at apply-time. If the cart changes
+  // afterwards the discount may no longer hold (e.g. GLAM20 needs a $65+ subtotal),
+  // and the server would re-evaluate and charge more than we displayed — so drop it.
+  const promoSubtotal = useRef<number | null>(null);
+  useEffect(() => {
+    if (promo && promoSubtotal.current !== null && promoSubtotal.current !== subtotal) {
+      setPromo(null);
+      promoSubtotal.current = null;
+    }
+  }, [subtotal, promo]);
+
   const isFreeShip = promo?.ok === true && promo.code === "FREESHIP";
-  const discount = promo?.ok && !isFreeShip ? promo.amount : 0;
-  const shipping = isFreeShip ? 0 : selectedRate?.amount ?? 0;
-  const taxable = Math.max(0, subtotal - discount);
-  const tax = +(taxable * TAX_RATE).toFixed(2);
-  const total = +(taxable + shipping + tax).toFixed(2);
+
+  // All money math in integer cents, mirroring the backend exactly.
+  const subtotalCents = toCents(subtotal);
+  const discountCents = promo?.ok && !isFreeShip ? toCents(promo.amount) : 0;
+  const shippingCents = isFreeShip ? 0 : toCents(selectedRate?.amount ?? 0);
+  const taxableCents = Math.max(0, subtotalCents - discountCents);
+  const taxCents = Math.round((taxableCents * TAX_BASIS_POINTS) / 10000);
+  const totalCents = taxableCents + shippingCents + taxCents;
+
+  const discount = fromCents(discountCents);
+  const shipping = fromCents(shippingCents);
+  const tax = fromCents(taxCents);
+  const total = fromCents(totalCents);
 
   function update<K extends keyof FormState>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -92,6 +135,7 @@ export function CheckoutForm() {
     setPromoPending(true);
     try {
       setPromo(await applyPromoCode(code, subtotal));
+      promoSubtotal.current = subtotal;
     } finally {
       setPromoPending(false);
     }
@@ -100,8 +144,21 @@ export function CheckoutForm() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (pending) return;
-    if (!form.email.trim() || !form.line1.trim() || !form.city.trim() || !form.zip.trim()) {
-      setError("Please fill in your email and shipping address (street, city, and ZIP).");
+    // Must mirror the backend's AddressDto constraints (common/dto/Dtos.java);
+    // anything laxer here surfaces as an opaque 400 at submit time.
+    const required: Array<[keyof FormState, string]> = [
+      ["email", "Email"],
+      ["firstName", "First name"],
+      ["lastName", "Last name"],
+      ["line1", "Address"],
+      ["city", "City"],
+      ["state", "State / Province"],
+      ["zip", "ZIP / Postal code"],
+      ["country", "Country"],
+    ];
+    const missing = required.filter(([k]) => !form[k].trim()).map(([, label]) => t(label));
+    if (missing.length > 0) {
+      setError(`${t("Please fill in")}: ${missing.join("、")}`);
       return;
     }
     if (!selectedRate) {
@@ -124,8 +181,9 @@ export function CheckoutForm() {
       country: form.country,
     };
 
+    let order;
     try {
-      const order = await createOrder({
+      order = await createOrder({
         lines: lines.map((l) => ({ handle: l.handle, quantity: l.quantity })),
         email: form.email,
         shippingAddress,
@@ -133,13 +191,29 @@ export function CheckoutForm() {
         promoCode: promo?.ok ? promo.code : undefined,
         idempotencyKey: idempotencyKey.current,
       });
-      sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
-      clear();
-      router.push("/checkout/confirmation");
-    } catch {
-      setError("Something went wrong placing your order. Please try again.");
+    } catch (err) {
+      // Surface what the server actually objected to. The uniform error envelope
+      // carries per-field reasons for a 400; without this the user only ever sees
+      // "something went wrong" and retries forever.
+      if (err instanceof ApiError) {
+        const fields = err.body?.fields;
+        const detail = fields && Object.keys(fields).length > 0 ? Object.keys(fields).join("、") : null;
+        setError(detail ? `${t("Please check")}: ${detail}` : err.message);
+      } else {
+        setError(t("Something went wrong placing your order. Please try again."));
+      }
       setPending(false);
+      return;
     }
+
+    // The order is committed at this point — nothing below may report it as failed.
+    try {
+      sessionStorage.setItem(LAST_ORDER_KEY, JSON.stringify(order));
+    } catch {
+      /* storage full / private mode — the confirmation page degrades, the order stands */
+    }
+    clear();
+    router.push("/checkout/confirmation");
   }
 
   return (

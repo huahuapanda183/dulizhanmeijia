@@ -57,3 +57,6 @@ temp/
 docs/PROJECT_MEMORY.md
 docs/research/BACKEND_DEPLOYMENT_PLAN.md
 docs/research/BACKEND_IMPLEMENTATION_CHECKLIST.md
+
+# H2 file-mode data dir (if ever enabled)
+backend/data/

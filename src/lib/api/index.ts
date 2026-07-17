@@ -9,7 +9,7 @@ export * from "./content";
 export * from "./checkout";
 export * from "./wishlist";
 export * from "./analytics";
-export { API_CONFIG } from "./config";
+export { API_CONFIG, ApiError } from "./config";
 
 import * as products from "./products";
 import * as collections from "./collections";

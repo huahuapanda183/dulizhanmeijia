@@ -1,5 +1,16 @@
 spring:
   datasource:
+    # In-memory H2 in MySQL compatibility mode. Data lives for the process only.
+    #
+    # Local MySQL is deliberately NOT used: this machine's only MySQL is
+    # MySQLPodsys (another project's production DB — strictly off-limits), and a
+    # second local instance would be 8.4 while production runs 8.0. MySQL 8.0
+    # dialect fidelity is covered by a CI service container instead.
+    #
+    # File-backed H2 was considered for cross-restart persistence but conflicts
+    # with spring.sql.init below (mode: always re-runs CREATE TABLE on every
+    # start). Doing it properly means putting the H2 schema under Flyway with its
+    # own migration location — a separate change, not needed for local E2E.
     url: jdbc:h2:mem:lynxiglam;MODE=MySQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;NON_KEYWORDS=VALUE,DAY;DB_CLOSE_DELAY=-1
     username: sa
     password:

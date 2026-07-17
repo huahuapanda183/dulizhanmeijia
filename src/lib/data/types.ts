@@ -220,7 +220,8 @@ export interface Order {
   total: number;
   currency: string;
   shippingAddress: Address;
-  status: "confirmed" | "processing" | "shipped" | "delivered";
+  /** Mirrors the orders.status ENUM in V1__schema.sql — 'cancelled' included. */
+  status: "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
   createdAt: string;
 }
 
