@@ -22,6 +22,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     if (stored === "en" || stored === "zh") setLocaleState(stored);
   }, []);
 
+  // Keep <html lang> in sync with the locale from BOTH paths — the toggle and the
+  // restore-from-storage above. Previously this lived only in setLocale(), which
+  // the restore path bypasses, so a returning zh visitor kept lang="en" until they
+  // re-toggled — wrong for screen readers, search engines and CJK font selection.
+  useEffect(() => {
+    document.documentElement.lang = locale === "zh" ? "zh-CN" : "en";
+  }, [locale]);
+
   const setLocale = (l: Locale) => {
     setLocaleState(l);
     try {
@@ -29,7 +37,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     } catch {
       /* ignore */
     }
-    document.documentElement.lang = l === "zh" ? "zh-CN" : "en";
   };
 
   return (

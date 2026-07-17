@@ -56,8 +56,8 @@ const collectionPositions = new Map();
 for (const [featuredPosition, product] of PRODUCTS.entries()) {
   add(
     "INSERT INTO products " +
-      "(id, handle, title, shape, price_cents, compare_at_price_cents, currency, rating, review_count, hover_image, video, badge, description, available, stock_quantity, featured_position, created_at) VALUES " +
-      `(${q(product.id)}, ${q(product.handle)}, ${q(product.title)}, ${q(product.shape)}, ${cents(product.price)}, ${cents(product.compareAtPrice)}, ${q(product.currency)}, ${q(product.rating)}, ${q(product.reviewCount)}, ${q(product.hoverImage)}, ${q(product.video)}, ${q(product.badge)}, ${q(product.description)}, ${q(product.available)}, NULL, ${featuredPosition}, ${sqlDateTime(product.createdAt)});`,
+      "(id, handle, title, shape, price_cents, compare_at_price_cents, currency, rating, review_count, hover_image, video, badge, description, available, featured_position, created_at) VALUES " +
+      `(${q(product.id)}, ${q(product.handle)}, ${q(product.title)}, ${q(product.shape)}, ${cents(product.price)}, ${cents(product.compareAtPrice)}, ${q(product.currency)}, ${q(product.rating)}, ${q(product.reviewCount)}, ${q(product.hoverImage)}, ${q(product.video)}, ${q(product.badge)}, ${q(product.description)}, ${q(product.available)}, ${featuredPosition}, ${sqlDateTime(product.createdAt)});`,
   );
   product.images.forEach((image, position) =>
     add(

@@ -8,6 +8,19 @@ export const LOCALES: { code: Locale; label: string }[] = [
 ];
 
 export const zh: Record<string, string> = {
+  // --- 数据库来源的集合标题/描述（经 <T> 渲染）---
+  // 由 scripts/check-i18n-coverage.mjs 守护：漏译会让中文页静默显示英文，
+  // 因为 translate() 是 `zh[key] ?? key`，查不到就原样返回、不报错。
+  // 联名 IP 与品牌名保留原文（Harry Potter™ / Hello Kitty® / Glamzilla / Fanatics
+  // 是受商标保护的专有名称，不应翻译）。
+  "Best Sellers": "热卖单品",
+  "Quick Press Mani": "快贴美甲",
+  "LynxiGlam x Glamzilla": "LynxiGlam x Glamzilla 联名",
+  "Harry Potter™ x LynxiGlam": "Harry Potter™ x LynxiGlam 联名",
+  "Hello Kitty® and Friends": "Hello Kitty® and Friends 联名",
+  "LynxiGlam x Fanatics": "LynxiGlam x Fanatics 联名",
+  "GLAMSQUAD FOREVER — by the squad, for the squad.": "GLAMSQUAD FOREVER —— 由姐妹团打造，为姐妹团而生。",
+
   // Nav (top-level)
   "SHOP ALL": "全部商品",
   "GLUE-ON NAILS": "穿戴甲",

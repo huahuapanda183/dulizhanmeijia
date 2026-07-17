@@ -13,7 +13,13 @@ CREATE TABLE products (
     badge VARCHAR(80) NULL,
     description TEXT NOT NULL,
     available BOOLEAN NOT NULL DEFAULT TRUE,
-    stock_quantity INT NULL,
+    -- No stock/inventory column on purpose. There is no oversell protection and no
+    -- decrement anywhere; a nullable column named stock_quantity only looks like
+    -- inventory and invites code to trust a value nothing maintains. Availability is
+    -- the boolean above. Real inventory is an additive change when it is actually
+    -- built: add the column plus the atomic conditional decrement
+    -- (UPDATE ... SET stock = stock - :q WHERE handle = :h AND stock >= :q) inside
+    -- the existing @Transactional createOrder, in one migration.
     featured_position INT UNSIGNED NOT NULL,
     created_at TIMESTAMP(6) NOT NULL,
     updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),

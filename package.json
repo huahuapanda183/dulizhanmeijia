@@ -32,7 +32,8 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "check": "npm run lint && npm run typecheck && npm run build"
+    "i18n:check": "node --experimental-strip-types scripts/check-i18n-coverage.mjs",
+    "check": "npm run lint && npm run typecheck && npm run i18n:check && npm run build"
   },
   "dependencies": {
     "clsx": "^2.1.1",
