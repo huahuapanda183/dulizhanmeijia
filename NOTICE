@@ -1,5 +1,45 @@
-NOTICE — third-party material and license scope
-================================================
+NOTICE — 第三方素材与授权范围说明
+====================================
+
+LICENSE 文件中的 MIT 授权**仅适用于本仓库的原创源代码**（src/ 下的 Next.js 应用、
+backend/ 下的 Spring Boot 应用，以及为本项目编写的脚本与文档）。
+
+以下内容**不在该授权范围内**，本项目对其不主张任何权利：
+
+1. 图片与视频
+   public/images/ 与 public/videos/ 下的文件，是在用本仓库练习"逆向复刻一个电商
+   站"时从 glamnetic.com 下载的。其著作权归 Glamnetic 及/或其许可方所有，包括商品
+   摄影、用户生成内容，以及含可识别模特形象的图像。它们在此仅作为非商业技术练习的
+   占位素材。本仓库不对其进行再授权；在本项目被发布、部署或用于任何商业用途之前，
+   必须将其移除或替换为自有/已授权的素材。
+
+2. 文字内容
+   src/lib/data/ 下以及 Flyway 种子脚本
+   （backend/src/main/resources/db/migration/V2__seed.sql）中的商品名称与描述、集合
+   文案、营销文案、博客文章、信息/条款页文本与评价，均衍生自 glamnetic.com，受同样
+   的限制。
+
+3. 商标与品牌标识
+   本应用引用或渲染的所有第三方名称、标识与商标——包括但不限于 Glamnetic、
+   Ulta Beauty、Sephora、Kohl's、Target、Harry Potter 与 Wizarding World
+   （Warner Bros.）、Shop Pay（Shopify）、Leaping Bunny（Cruelty Free
+   International），以及"As Seen On"区块中展示的各家媒体——均归其各自所有者所有。
+   它们出现在此处属于复刻练习的遗留产物，**不代表任何形式的关联、背书、赞助、经销
+   关系、认证、获奖或授权**。
+
+4. 非真实内容声明
+   本应用渲染的评价、评分、评价数、奖项徽章、认证声明、零售商在售信息、媒体报道、
+   会员权益、配送与退换政策，均为开发阶段编造的占位/示例数据。**这些内容没有一项是
+   真实的，不应被作为任何依据。**
+
+上游署名
+--------
+本项目基于 JCodesMore 的 ai-website-clone-template 搭建，依据其 MIT 授权使用。
+上游版权声明保留于 LICENSE 文件中。
+
+
+NOTICE — third-party material and license scope (English)
+=========================================================
 
 The MIT license in LICENSE applies ONLY to the original source code in this
 repository (the Next.js application under src/, the Spring Boot application
