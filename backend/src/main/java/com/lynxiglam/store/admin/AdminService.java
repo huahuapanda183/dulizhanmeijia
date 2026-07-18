@@ -53,6 +53,38 @@ public class AdminService {
         return true;
     }
 
+    /**
+     * Create an admin, or rotate an existing one's password (and reactivate it).
+     * UPDATE-first rather than findByEmail-then-insert, because findByEmail
+     * filters on active = TRUE: a deactivated row would otherwise be invisible
+     * and the INSERT would then collide with the UNIQUE(email) constraint,
+     * leaving no way to ever recover that account. Used by AdminProvisionRunner
+     * for prod, where AdminBootstrap does not run.
+     *
+     * @return true if a new admin row was created, false if an existing one was rotated
+     */
+    public boolean upsertAdmin(String email, String rawPassword, String role) {
+        String normalized = normalize(email);
+        String hash = passwordEncoder.encode(rawPassword);
+        int updated = jdbc.update(
+                "UPDATE admin_users SET password_hash = :hash, role = :role, active = TRUE WHERE email = :email",
+                new MapSqlParameterSource()
+                        .addValue("hash", hash)
+                        .addValue("role", role)
+                        .addValue("email", normalized)
+        );
+        if (updated > 0) return false;
+        jdbc.update(
+                "INSERT INTO admin_users (id, email, password_hash, role) VALUES (:id, :email, :hash, :role)",
+                new MapSqlParameterSource()
+                        .addValue("id", UUID.randomUUID().toString())
+                        .addValue("email", normalized)
+                        .addValue("hash", hash)
+                        .addValue("role", role)
+        );
+        return true;
+    }
+
     private static String normalize(String email) {
         return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }

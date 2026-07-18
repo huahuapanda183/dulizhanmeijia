@@ -1,0 +1,97 @@
+# /etc/systemd/system/lynxiglam-api.service
+[Unit]
+Description=LynxiGlam commerce API (Spring Boot 4 / Java 21)
+Documentation=file:///opt/lynxiglam/RUNBOOK.md
+After=network-online.target mysql.service
+Wants=network-online.target
+# NOTE: deliberately NOT Requires=mysql.service — a co-tenant's MySQL restart
+# must never cascade into stopping/starting units, and we must never be a
+# reason MySQL gets touched.
+
+[Service]
+Type=exec
+Slice=lynxiglam.slice
+User=lynxiglam-api
+Group=lynxiglam-api
+WorkingDirectory=/opt/lynxiglam/current/backend
+
+# --- Secrets: file only, never inline. systemd reads this as root BEFORE
+# --- dropping to lynxiglam-api, so the file can be root:root 0600.
+EnvironmentFile=/etc/lynxiglam/lynxiglam.env
+
+# --- Profile is pinned here. Without this the jar would fall back to
+# --- spring.profiles.default (see §7 — we also change that default to `prod`).
+Environment=SPRING_PROFILES_ACTIVE=prod
+Environment=LANG=C.UTF-8
+Environment=TZ=UTC
+
+# --- VERIFY THIS PATH ON THE HOST: readlink -f $(which java)
+#     Debian openjdk: /usr/lib/jvm/java-21-openjdk-amd64/bin/java
+#     Adoptium apt:   /usr/lib/jvm/temurin-21-jdk-amd64/bin/java
+ExecStart=/usr/lib/jvm/java-21-openjdk-amd64/bin/java \
+  -Xms128m \
+  -Xmx512m \
+  -XX:MaxMetaspaceSize=192m \
+  -XX:MaxDirectMemorySize=64m \
+  -XX:+ExitOnOutOfMemoryError \
+  -XX:+UseSerialGC \
+  -XX:ActiveProcessorCount=2 \
+  -Xss512k \
+  -Xlog:gc+init=info:stdout \
+  -Djava.awt.headless=true \
+  -Dfile.encoding=UTF-8 \
+  -jar /opt/lynxiglam/current/backend/store.jar
+
+Restart=always
+RestartSec=5s
+TimeoutStopSec=30s
+KillSignal=SIGTERM
+SuccessExitStatus=143
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+# --- Resource caps (the documented hard constraints, ENFORCED not asserted) ---
+MemoryAccounting=yes
+MemoryHigh=896M
+MemoryMax=1G
+MemorySwapMax=0
+CPUAccounting=yes
+CPUQuota=200%
+CPUWeight=50
+TasksMax=256
+LimitNOFILE=4096
+
+# --- Hardening ---
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectProc=invisible
+ProtectClock=yes
+ProtectHostname=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RemoveIPC=yes
+UMask=0077
+CapabilityBoundingSet=
+AmbientCapabilities=
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
+MemoryDenyWriteExecute=no
+
+# --- Egress lockdown: this service talks ONLY to loopback (MySQL). It cannot
+# --- reach the internet or any co-tenant's network service, by kernel policy.
+IPAddressDeny=any
+IPAddressAllow=localhost
+
+[Install]
+WantedBy=multi-user.target

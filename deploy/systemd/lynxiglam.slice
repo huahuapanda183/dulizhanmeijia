@@ -1,0 +1,22 @@
+# /etc/systemd/system/lynxiglam.slice
+#
+# Aggregate resource ceiling for ALL LynxiGlam processes. The per-unit limits
+# (1g API + 512m web) are the first line; this slice is the backstop that holds
+# even if a unit file is edited by mistake. On a Swap=0 host, memory exhaustion
+# invokes the OOM killer against the WHOLE machine — including podsys/kejing.
+# This slice guarantees the kernel reclaims/kills inside LynxiGlam first.
+[Unit]
+Description=LynxiGlam tenant slice (aggregate caps; protects co-tenant processes)
+Before=slices.target
+
+[Slice]
+MemoryAccounting=yes
+MemoryHigh=1400M          # reclaim pressure starts here — throttle before killing
+MemoryMax=1600M           # hard ceiling: 1024 (api) + 512 (web) + 64 slack
+MemorySwapMax=0           # host has Swap=0; make that explicit and enforced
+CPUAccounting=yes
+CPUQuota=300%             # never take more than 3 of 12 cores, even under BCrypt DoS
+CPUWeight=50              # on contention, co-tenants (default 100) win
+IOWeight=50
+TasksAccounting=yes
+TasksMax=512

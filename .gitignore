@@ -60,3 +60,8 @@ docs/research/BACKEND_IMPLEMENTATION_CHECKLIST.md
 
 # H2 file-mode data dir (if ever enabled)
 backend/data/
+
+# Deploy secrets — only the *.example / *.cnf.example templates belong in git.
+deploy/*.env
+deploy/**/*.cnf
+!deploy/**/*.cnf.example

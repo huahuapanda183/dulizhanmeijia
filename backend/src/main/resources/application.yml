@@ -2,7 +2,16 @@ spring:
   application:
     name: lynxiglam-store
   profiles:
-    default: local
+    # Fail SAFE, not convenient. `prod` requires ${DB_URL}/${DB_USER}/${DB_PASSWORD}
+    # and aborts loudly at startup if they are absent — the correct behaviour for a
+    # missing config. The old `local` default silently booted H2 + AdminBootstrap's
+    # known password, and application-local.yml.example points at :3306 (MySQLPodsys,
+    # another project's PRODUCTION db), so a `local` default was one GRANT away from
+    # Flyway running V1/V2 into a neighbour. Making local opt-in-only removes that path.
+    # Safe for tests: src/test/resources/application.yml shadows this whole file on the
+    # test classpath, so no test resolves this key. Local dev already passes
+    # -Dspring-boot.run.profiles=dev explicitly (docs/PROJECT_MEMORY.md).
+    default: prod
   jackson:
     default-property-inclusion: non_null
   jpa:
@@ -11,12 +20,22 @@ spring:
       ddl-auto: validate
   flyway:
     enabled: true
+  lifecycle:
+    # Bounded in-flight drain; must stay under the unit's TimeoutStopSec=30.
+    timeout-per-shutdown-phase: 20s
 
 server:
   port: 8090
+  # Finish in-flight requests on SIGTERM instead of severing them mid-order.
+  shutdown: graceful
   servlet:
     context-path: /api
     session:
+      # Was implicit (Boot's 30m default). Pinned so it is reviewable, and so a
+      # future Boot default change cannot silently widen the window. Sessions are
+      # in-memory Tomcat sessions (no Spring Session/Redis) => a backend restart
+      # signs everyone out. Acceptable, but know it before debugging it.
+      timeout: 30m
       cookie:
         name: lynxiglam_session
         http-only: true

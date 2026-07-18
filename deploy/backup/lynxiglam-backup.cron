@@ -1,0 +1,17 @@
+# /etc/cron.d/lynxiglam-backup
+#
+# CHOOSE THE HOUR ONLY AFTER MEASURING. This host runs podsys Celery beat
+# (order reconciliation) plus blue/video/videotrans transcoding, KeJing's Django
+# + AI image workers, and a Docker stack. Colliding with a transcode burst on a
+# Swap=0 box is how a backup becomes an OOM event in someone else's project.
+# Before installing:
+#     sudo crontab -l; for u in $(cut -f1 -d: /etc/passwd); do sudo crontab -l -u $u 2>/dev/null; done
+#     ls -la /etc/cron.d/ /etc/cron.daily/; systemctl list-timers --all
+#     grep -riE 'beat_schedule|crontab' /root/ 2>/dev/null | head
+# 04:23 is a deliberately odd, low-collision default. Adjust to a real quiet
+# window once you have looked.
+SHELL=/bin/bash
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+MAILTO=""
+
+23 4 * * *  root  /usr/local/sbin/lynxiglam-backup.sh 2>&1 | logger -t lynxiglam-backup

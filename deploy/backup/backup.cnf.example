@@ -1,0 +1,10 @@
+; deploy/backup/backup.cnf.example  ->  /etc/lynxiglam/backup.cnf  (root:root 0600)
+;
+; Credentials for the read-only lynxiglam_backup user created by
+; deploy/mysql/001-bootstrap.sql. NEVER commit the real file — it is gitignored
+; (deploy/*.cnf). Loopback + TCP so it matches the '127.0.0.1' account host.
+[client]
+user=lynxiglam_backup
+password=REPLACE_ME
+host=127.0.0.1
+protocol=TCP

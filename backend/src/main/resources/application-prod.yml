@@ -9,6 +9,11 @@ spring:
       connection-timeout: 3000
       validation-timeout: 1000
       max-lifetime: 1700000
+      # Surface a pool leak in the log instead of as a silent stall. With a
+      # server-side MAX_USER_CONNECTIONS 10 backstop, a leak here degrades only
+      # LynxiGlam — but we still want to know.
+      leak-detection-threshold: 20000
+      pool-name: lynxiglam-hikari
   jpa:
     properties:
       hibernate:
@@ -21,3 +26,50 @@ server:
     session:
       cookie:
         secure: true
+  tomcat:
+    threads:
+      # 200 (the default) x ~1MB of stack is ~200MB of native memory that the
+      # 1g cgroup cap does not forgive, and 200 threads all running BCrypt-12
+      # would saturate all 12 cores. 50 is ample for this traffic and bounds
+      # both. CPUQuota=200% is the independent backstop.
+      max: 50
+      min-spare: 10
+    max-connections: 200
+    accept-count: 100
+    connection-timeout: 5s
+    max-http-form-post-size: 256KB
+  max-http-request-header-size: 16KB
+
+# Swagger/OpenAPI is publicly exposed by default: SecurityConfig permitAll's
+# /v3/api-docs/** and /swagger-ui/**, and the context-path is /api, so
+# https://lynxiglam.kejing.online/api/swagger-ui.html would publish the full
+# API surface — an attacker's endpoint map. Off in prod at the app, AND 404'd
+# at nginx (two independent controls; neither is load-bearing alone).
+# Safe for tests: application-prod.yml is not on the test classpath, so the
+# OpenAPI contract test is unaffected.
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+# Narrow the actuator surface in prod. `metrics` (from application.yml) would
+# require an admin session anyway via anyRequest().authenticated(), but there is
+# no reason to route it at all. nginx 404s /api/actuator regardless.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+
+logging:
+  level:
+    root: INFO
+    com.lynxiglam.store: INFO
+    # Never DEBUG in prod: it logs bound SQL parameters, i.e. customer emails
+    # and order contents, into a shared journald.
+    org.hibernate.SQL: WARN
