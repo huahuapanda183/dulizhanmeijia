@@ -101,10 +101,12 @@ export async function createOrder(input: OrderInput): Promise<Order> {
   let discount = 0;
   if (input.promoCode) {
     const promo = await applyPromoCode(input.promoCode, subtotal);
-    if (promo.ok) {
-      if (promo.code === "FREESHIP") shipping = 0;
-      else discount = promo.amount;
-    }
+    // Match the backend: an invalid or below-threshold code is rejected, not
+    // silently dropped. Ignoring it charged full price behind a success response,
+    // so the customer believed a discount had applied.
+    if (!promo.ok) throw new Error(promo.message);
+    if (promo.code === "FREESHIP") shipping = 0;
+    else discount = promo.amount;
   }
 
   const taxable = Math.max(0, subtotal - discount);

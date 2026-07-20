@@ -24,6 +24,10 @@ import java.util.Optional;
 
 @Service
 public class CatalogService {
+    /** Bounds a single response; also keeps page*pageSize well inside a long. */
+    private static final int MAX_PAGE_SIZE = 200;
+    private static final int MAX_PAGE = 10_000;
+
     private static final Map<String, String> SORTS = Map.of(
             "featured", "p.featured_position ASC",
             "price-asc", "p.price_cents ASC, p.featured_position ASC",
@@ -45,11 +49,21 @@ public class CatalogService {
         String order = SORTS.getOrDefault(query.sort(), SORTS.get("featured"));
         StringBuilder sql = new StringBuilder(BASE_SELECT).append(where).append(" ORDER BY ").append(order);
 
-        Integer pageSize = positive(query.pageSize());
-        Integer page = positive(query.page());
-        Integer limit = positive(query.limit());
+        // Reject out-of-range paging instead of silently ignoring it. positive()
+        // mapped page=0/-1 to null, which dropped the LIMIT clause entirely and
+        // returned the WHOLE catalog — the opposite of what the caller asked for,
+        // and an unbounded response as the catalog grows.
+        requireInRange("page", query.page(), 1, MAX_PAGE);
+        requireInRange("pageSize", query.pageSize(), 1, MAX_PAGE_SIZE);
+        requireInRange("limit", query.limit(), 1, MAX_PAGE_SIZE);
+
+        Integer pageSize = query.pageSize();
+        Integer page = query.page();
+        Integer limit = query.limit();
         if (page != null && pageSize != null) {
-            params.addValue("limit", pageSize).addValue("offset", (page - 1) * pageSize);
+            // long offset: page * pageSize at the upper bounds exceeds int range.
+            long offset = (long) (page - 1) * pageSize;
+            params.addValue("limit", pageSize).addValue("offset", offset);
             sql.append(" LIMIT :limit OFFSET :offset");
         } else if (limit != null) {
             params.addValue("limit", limit);
@@ -116,7 +130,9 @@ public class CatalogService {
     }
 
     public List<ProductDto> recommendations(String handle, int requestedLimit) {
-        int limit = Math.max(1, Math.min(requestedLimit, 12));
+        // A negative limit used to clamp to 1 and quietly return a result; say so instead.
+        if (requestedLimit < 1) throw new IllegalArgumentException("limit must be at least 1.");
+        int limit = Math.min(requestedLimit, 12);
         MapSqlParameterSource params = new MapSqlParameterSource().addValue("handle", handle).addValue("limit", limit);
         String sql = BASE_SELECT +
                 " JOIN (" +
@@ -210,8 +226,13 @@ public class CatalogService {
         );
     }
 
-    private static Integer positive(Integer value) {
-        return value == null || value < 1 ? null : value;
+    /** Absent is fine (the parameter is optional); present-but-out-of-range is a 400. */
+    private static void requireInRange(String name, Integer value, int min, int max) {
+        if (value == null) return;
+        if (value < min || value > max) {
+            throw new IllegalArgumentException(
+                    name + " must be between " + min + " and " + max + ".");
+        }
     }
 
     private static String titleCase(String value) {

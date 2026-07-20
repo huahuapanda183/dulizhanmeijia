@@ -14,7 +14,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -39,19 +42,23 @@ public class CheckoutService {
 
     private final NamedParameterJdbcTemplate jdbc;
     private final ObjectMapper objectMapper;
-    private final int freeShippingThresholdCents;
     private final BigDecimal taxRate;
+    /** Independent transaction used only to read a concurrently-committed order. */
+    private final TransactionTemplate recoveryTx;
 
     public CheckoutService(
             NamedParameterJdbcTemplate jdbc,
             ObjectMapper objectMapper,
-            @Value("${app.commerce.free-shipping-threshold-cents}") int freeShippingThresholdCents,
+            PlatformTransactionManager transactionManager,
             @Value("${app.commerce.tax-rate}") BigDecimal taxRate
     ) {
         this.jdbc = jdbc;
         this.objectMapper = objectMapper;
-        this.freeShippingThresholdCents = freeShippingThresholdCents;
         this.taxRate = taxRate;
+        this.recoveryTx = new TransactionTemplate(transactionManager);
+        this.recoveryTx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+        this.recoveryTx.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+        this.recoveryTx.setReadOnly(true);
     }
 
     public List<ShippingRateDto> shippingRates(BigDecimal subtotal) {
@@ -162,11 +169,19 @@ public class CheckoutService {
         String promoCode = null;
         if (input.promoCode() != null && !input.promoCode().isBlank()) {
             PromoResultDto promo = promo(input.promoCode(), Money.fromCents(subtotal));
-            if (promo.ok()) {
-                promoCode = promo.code();
-                if (promo.code().equals("FREESHIP")) shipping = 0;
-                else discount = Money.toCents(promo.amount());
+            if (!promo.ok()) {
+                // Reject rather than silently drop it. Previously an invalid or
+                // below-threshold code was ignored and the order went through at full
+                // price with a 200 and no signal — the customer believed a discount had
+                // applied and was charged more. The client can re-submit without the code.
+                throw new IllegalArgumentException(promo.message());
             }
+            promoCode = promo.code();
+            // Decide by KIND, not by matching the literal "FREESHIP". A second
+            // free_ship row (say SHIPFREE) would otherwise report "Free shipping
+            // applied!" and then still charge shipping.
+            if (isFreeShipping(promo.code())) shipping = 0;
+            else discount = Money.toCents(promo.amount());
         }
         int taxable = Math.max(0, subtotal - discount);
         int tax = Money.tax(taxable, taxRate);
@@ -198,11 +213,29 @@ public class CheckoutService {
                 );
             }
         } catch (DuplicateKeyException exception) {
-            OrderDto concurrent = findByIdempotencyKey(input.idempotencyKey());
+            // A concurrent submission with the same key won the unique constraint.
+            // Read its order in a SEPARATE, READ_COMMITTED transaction: this method
+            // runs in MySQL's default REPEATABLE READ, so re-reading inside the
+            // current snapshot cannot see the winner's just-committed row and the
+            // caller got a 409 for an order that had in fact been placed.
+            OrderDto concurrent = recoveryTx.execute(status -> findByIdempotencyKey(input.idempotencyKey()));
             if (concurrent != null) return concurrent;
             throw new ConflictException("Order submission conflicted. Please retry.");
         }
         return findByIdempotencyKey(input.idempotencyKey());
+    }
+
+    /**
+     * Whether a promo code is a free-shipping code, by its `kind` column rather than
+     * by its name. PromoResultDto deliberately carries no kind — it is the public API
+     * shape — so the lookup happens here instead of widening the client contract.
+     */
+    private boolean isFreeShipping(String code) {
+        List<String> kinds = jdbc.queryForList(
+                "SELECT kind FROM promo_codes WHERE code = :code",
+                new MapSqlParameterSource("code", code), String.class
+        );
+        return !kinds.isEmpty() && "free_ship".equals(kinds.getFirst());
     }
 
     private OrderDto findByIdempotencyKey(String idempotencyKey) {
