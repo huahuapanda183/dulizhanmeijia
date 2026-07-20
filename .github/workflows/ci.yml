@@ -27,7 +27,7 @@ jobs:
           NEXT_PUBLIC_DATA_SOURCE: mock
 
   backend:
-    name: Backend (45 tests)
+    name: Backend tests (H2 — fast feedback)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -39,8 +39,69 @@ jobs:
           cache: maven
 
       # Tests run on in-memory H2 via MockMvc — no database or open port needed.
+      # H2 is fast but NOT faithful; `backend-mysql` below is the authority.
       - run: ./mvnw --batch-mode test
         working-directory: backend
+
+  backend-mysql:
+    name: Backend tests (real MySQL 8.0 — the authority)
+    runs-on: ubuntu-latest
+    # WHY THIS JOB EXISTS. The H2 job above once passed while the live system was
+    # broken: H2 declares min_subtotal_cents/price_cents as signed INT, production
+    # uses INT UNSIGNED. MySQL's driver returns Long for INT UNSIGNED, so a
+    # `(Integer) rs.getObject(...)` cast threw and EVERY promo code with a
+    # threshold (GLAM20) returned HTTP 500 — with a green test asserting it worked.
+    # The same divergence let an int order-total overflow persist silently on H2.
+    # Engine fidelity, not test count, is what catches that class of bug: this job
+    # runs the identical suite against production's exact engine version.
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: ci
+          MYSQL_DATABASE: lynxiglam_test
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pci"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: maven
+
+      # Override the datasource via ENVIRONMENT VARIABLES, not -D system properties:
+      # Surefire forks a JVM, and -D on the Maven command line does not reliably
+      # reach that fork — the job would silently run H2 again and pass, which is
+      # exactly the failure mode this job exists to prevent. Env vars are inherited
+      # by the fork, and Spring Boot's relaxed binding maps SPRING_DATASOURCE_URL
+      # onto spring.datasource.url. Verified locally against a real MySQL before
+      # being committed.
+      # AbstractIntegrationTest detects MySQL and rebuilds each test's schema from
+      # the production V1__schema.sql (not the H2 copy).
+      - name: Run the suite against MySQL 8.0
+        working-directory: backend
+        env:
+          SPRING_DATASOURCE_URL: "jdbc:mysql://127.0.0.1:3306/lynxiglam_test?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC&allowPublicKeyRetrieval=true&useSSL=false"
+          SPRING_DATASOURCE_USERNAME: root
+          SPRING_DATASOURCE_PASSWORD: ci
+          SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+        run: ./mvnw --batch-mode test
+
+      # Fail loudly if the override silently did not apply. Without this, a future
+      # change to how the datasource is configured could quietly return this job to
+      # testing H2 while still reporting green.
+      - name: Prove the suite really ran on MySQL
+        run: |
+          COLS=$(mysql -h 127.0.0.1 -uroot -pci -N -e "
+            SELECT COUNT(*) FROM information_schema.columns
+            WHERE table_schema='lynxiglam_test'
+              AND column_name='min_subtotal_cents' AND column_type LIKE '%unsigned%';")
+          echo "INT UNSIGNED money columns found in the test schema: $COLS"
+          test "$COLS" -ge 1 || { echo "FATAL: tests did not run against MySQL's production schema"; exit 1; }
 
   migration:
     name: Flyway migration on real MySQL 8.0

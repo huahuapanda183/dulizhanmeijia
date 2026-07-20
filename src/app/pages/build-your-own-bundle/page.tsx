@@ -20,7 +20,8 @@ export default async function BuildYourOwnBundlePage() {
             <T k="Build Your Own Nail Bundle" />
           </h1>
           <p className="mx-auto mt-3 max-w-[560px] text-center text-[15px] text-body">
-            <T k="Mix & match your favorite sets. The more you add, the more you save — 3 for 15% off, 5 for 20% off." />
+            {/* No discount claim here: nothing in checkout grants one. See BundleBuilder. */}
+            <T k="Mix & match your favorite sets to build a bundle in your own style." />
           </p>
           <div className="mt-8">
             <BundleBuilder products={products} />

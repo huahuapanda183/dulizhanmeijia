@@ -30,6 +30,13 @@ import java.util.UUID;
 
 @Service
 public class CheckoutService {
+    /**
+     * $1,000,000 in cents. Far above any legitimate order, and far below both
+     * Integer.MAX_VALUE and the orders.*_cents INT UNSIGNED column limit, so the
+     * subsequent shipping + tax additions cannot overflow the int either.
+     */
+    private static final long MAX_ORDER_CENTS = 100_000_000L;
+
     private final NamedParameterJdbcTemplate jdbc;
     private final ObjectMapper objectMapper;
     private final int freeShippingThresholdCents;
@@ -78,11 +85,20 @@ public class CheckoutService {
         List<PromoBase> rows = jdbc.query(
                 "SELECT code, kind, value, min_subtotal_cents, active, expires_at FROM promo_codes WHERE code = :code",
                 new MapSqlParameterSource("code", code),
-                (rs, rowNum) -> new PromoBase(
-                        rs.getString("code"), rs.getString("kind"), rs.getInt("value"),
-                        (Integer) rs.getObject("min_subtotal_cents"), rs.getBoolean("active"),
-                        rs.getTimestamp("expires_at") == null ? null : rs.getTimestamp("expires_at").toInstant()
-                )
+                (rs, rowNum) -> {
+                    // (Number), never (Integer): min_subtotal_cents is INT UNSIGNED, and
+                    // MySQL Connector/J hands those back as Long — a direct (Integer) cast
+                    // throws ClassCastException, which surfaced as a blanket HTTP 500 for
+                    // every code that has a threshold (i.e. GLAM20). H2 types it as signed
+                    // INT, so the tests passed while the live endpoint was broken.
+                    // Matches the same pattern already used at shippingRates() above.
+                    Number minSubtotal = (Number) rs.getObject("min_subtotal_cents");
+                    return new PromoBase(
+                            rs.getString("code"), rs.getString("kind"), rs.getInt("value"),
+                            minSubtotal == null ? null : minSubtotal.intValue(), rs.getBoolean("active"),
+                            rs.getTimestamp("expires_at") == null ? null : rs.getTimestamp("expires_at").toInstant()
+                    );
+                }
         );
         if (rows.isEmpty() || !rows.getFirst().active() || (rows.getFirst().expiresAt() != null && rows.getFirst().expiresAt().isBefore(Instant.now()))) {
             return new PromoResultDto(false, code, BigDecimal.ZERO, "That code isn't valid.");
@@ -125,7 +141,19 @@ public class CheckoutService {
             if (found.isEmpty()) throw new NotFoundException("Product is unavailable: " + requested.handle());
             lines.add(found.getFirst());
         }
-        int subtotal = lines.stream().mapToInt(line -> Money.toCents(line.price()) * line.quantity()).sum();
+        // Accumulate in long with checked arithmetic. The DTO bounds quantity/lines, but
+        // this must hold on its own: an int subtotal silently wrapped (a 2.38M-unit order
+        // of a $17.99 item was charged $12.84), and on H2's signed INT a wrapped negative
+        // total even persisted. Overflow now becomes a 400, never a mispriced order.
+        long subtotalLong = 0;
+        for (CartLineDto line : lines) {
+            long lineTotal = Math.multiplyExact((long) Money.toCents(line.price()), (long) line.quantity());
+            subtotalLong = Math.addExact(subtotalLong, lineTotal);
+        }
+        if (subtotalLong > MAX_ORDER_CENTS) {
+            throw new IllegalArgumentException("Order total exceeds the maximum permitted amount.");
+        }
+        int subtotal = (int) subtotalLong;
         ShippingRateDto selectedRate = shippingRates(Money.fromCents(subtotal)).stream()
                 .filter(rate -> rate.id().equals(input.shippingRateId())).findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Unknown shipping rate: " + input.shippingRateId()));

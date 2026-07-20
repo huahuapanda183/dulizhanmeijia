@@ -2,10 +2,12 @@ package com.lynxiglam.store.common.dto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -118,9 +120,18 @@ public final class Dtos {
     public record PromoRequest(@NotBlank String code, BigDecimal subtotal) {}
     public record PromoResultDto(boolean ok, String code, BigDecimal amount, String message) {}
 
-    public record OrderLineInputDto(@NotBlank String handle, @Min(1) int quantity) {}
+    /**
+     * @Max is not cosmetic: subtotal was accumulated in a 32-bit int, so an
+     * unbounded quantity wrapped around — a real order for 2,387,420 units of a
+     * $17.99 item was accepted and charged $12.84 (1799 * 2387420 mod 2^32).
+     * 999 is far above any legitimate order and far below the wrap point.
+     * CheckoutService also computes in long with overflow checks, so neither
+     * control is load-bearing alone.
+     */
+    public record OrderLineInputDto(@NotBlank String handle, @Min(1) @Max(999) int quantity) {}
     public record OrderInputDto(
-            @NotEmpty List<@Valid OrderLineInputDto> lines,
+            // Bounded too: 200 lines x 999 each still cannot approach the overflow point.
+            @NotEmpty @Size(max = 200) List<@Valid OrderLineInputDto> lines,
             @Email @NotBlank String email,
             @NotNull @Valid AddressDto shippingAddress,
             @NotBlank String shippingRateId,

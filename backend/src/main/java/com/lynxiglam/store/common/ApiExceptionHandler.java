@@ -45,6 +45,18 @@ public class ApiExceptionHandler {
     }
 
     /**
+     * Out-of-range numeric input is the caller's fault, not a server fault.
+     * Money.toCents/percentage/tax use intValueExact(), so an absurd query value
+     * (e.g. ?subtotal=99999999999) or an overflowing order total would otherwise
+     * fall through to the catch-all below and be reported as a 500.
+     * The message is deliberately generic — never echo the offending value back.
+     */
+    @ExceptionHandler(ArithmeticException.class)
+    ResponseEntity<ApiError> outOfRange(ArithmeticException exception) {
+        return response(HttpStatus.BAD_REQUEST, "bad_request", "A numeric value is out of range.", Map.of());
+    }
+
+    /**
      * Controllers (e.g. wishlist without a session) raise ResponseStatusException.
      * Map it onto the same ApiError envelope so clients always receive our JSON
      * shape and can branch on the HTTP status (e.g. 401 vs 500).

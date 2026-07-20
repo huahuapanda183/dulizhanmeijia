@@ -23,17 +23,25 @@ export function BundleBuilder({ products }: { products: Product[] }) {
       return next;
     });
 
-  const { count, subtotal, discountRate, total, currency } = useMemo(() => {
+  // Shows the true price only. This used to advertise "3 for 15% off / 5 for 20% off"
+  // with a struck-through subtotal, but addBundle() adds every item at full price and
+  // attaches no promo code, and the server recomputes the order from price_cents — so
+  // a 5-item bundle displayed $71.96 and then charged $89.95. Displaying a discount the
+  // checkout will not honour is worse than showing no discount at all. To bring the
+  // offer back, add a real promo_codes row and apply it through applyPromoCode() so the
+  // server grants the same amount the page promises.
+  const { count, subtotal, currency } = useMemo(() => {
     let count = 0;
-    let subtotal = 0;
+    let subtotalCents = 0;
     const currency = products[0]?.currency ?? "USD";
     for (const p of products) {
       const q = selected[p.handle] ?? 0;
       count += q;
-      subtotal += q * p.price;
+      // Integer cents, matching the server's money model — float accumulation here
+      // drifted from the charged total.
+      subtotalCents += q * Math.round(p.price * 100);
     }
-    const discountRate = count >= 5 ? 0.2 : count >= 3 ? 0.15 : 0;
-    return { count, subtotal, discountRate, total: subtotal * (1 - discountRate), currency };
+    return { count, subtotal: subtotalCents / 100, currency };
   }, [selected, products]);
 
   const addBundle = () => {
@@ -95,16 +103,10 @@ export function BundleBuilder({ products }: { products: Product[] }) {
           <span className="text-[15px] text-ink">
             {count} {t(count === 1 ? "item in bundle" : "items in bundle")}
           </span>
-          {discountRate > 0 && (
-            <span className="text-[13px] font-medium text-mauve">
-              {t("You're saving")} {Math.round(discountRate * 100)}%
-            </span>
-          )}
         </div>
         <div className="flex items-center gap-5">
           <span className="text-[16px]">
-            {discountRate > 0 && <span className="mr-2 text-body line-through">{formatPrice(subtotal, currency)}</span>}
-            <span className="font-medium text-ink">{formatPrice(total, currency)}</span>
+            <span className="font-medium text-ink">{formatPrice(subtotal, currency)}</span>
           </span>
           <button
             type="button"

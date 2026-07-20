@@ -19,6 +19,8 @@ import tools.jackson.databind.ObjectMapper;
 import javax.sql.DataSource;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -59,14 +61,36 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void resetDatabase() throws Exception {
         try (Connection connection = dataSource.getConnection()) {
-            ScriptUtils.executeSqlScript(connection, new ByteArrayResource("DROP ALL OBJECTS;".getBytes(StandardCharsets.UTF_8)));
-            ScriptUtils.executeSqlScript(connection, new ClassPathResource("db/dev/schema-h2.sql"));
+            String product = connection.getMetaData().getDatabaseProductName();
+            if (product != null && product.toLowerCase(Locale.ROOT).contains("mysql")) {
+                // Real MySQL: rebuild from the PRODUCTION migration, not the H2 copy.
+                // This is the whole point of the mysql CI job — H2's schema types
+                // min_subtotal_cents/price_cents as signed INT while production uses
+                // INT UNSIGNED, and that single divergence hid a promo-code crash and
+                // an order-total overflow behind a green H2 suite.
+                dropAllMySqlTables(connection);
+                ScriptUtils.executeSqlScript(connection, new ClassPathResource("db/migration/V1__schema.sql"));
+            } else {
+                ScriptUtils.executeSqlScript(connection, new ByteArrayResource("DROP ALL OBJECTS;".getBytes(StandardCharsets.UTF_8)));
+                ScriptUtils.executeSqlScript(connection, new ClassPathResource("db/dev/schema-h2.sql"));
+            }
             ScriptUtils.executeSqlScript(connection, new ClassPathResource("db/migration/V2__seed.sql"));
         }
         jdbc.update(
                 "INSERT INTO admin_users (id, email, password_hash, role) VALUES (?, ?, ?, 'ADMIN')",
                 UUID.randomUUID().toString(), ADMIN_EMAIL, passwordEncoder.encode(ADMIN_PASSWORD)
         );
+    }
+
+    /** MySQL has no DROP ALL OBJECTS; drop every table with FK checks suspended. */
+    private void dropAllMySqlTables(Connection connection) throws Exception {
+        List<String> tables = jdbc.queryForList(
+                "SELECT table_name FROM information_schema.tables WHERE table_schema = DATABASE()", String.class);
+        if (tables.isEmpty()) return;
+        StringBuilder sql = new StringBuilder("SET FOREIGN_KEY_CHECKS=0;");
+        for (String table : tables) sql.append("DROP TABLE IF EXISTS `").append(table).append("`;");
+        sql.append("SET FOREIGN_KEY_CHECKS=1;");
+        ScriptUtils.executeSqlScript(connection, new ByteArrayResource(sql.toString().getBytes(StandardCharsets.UTF_8)));
     }
 
     // ---- request helpers (paths are relative to the context-path, e.g. "/products") ----

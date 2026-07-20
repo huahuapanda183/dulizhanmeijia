@@ -321,8 +321,8 @@ export const zh: Record<string, string> = {
 
   // Bundle builder
   "Build Your Own Nail Bundle": "自由搭配美甲套装",
-  "Mix & match your favorite sets. The more you add, the more you save — 3 for 15% off, 5 for 20% off.":
-    "自由搭配你喜爱的套组，加得越多省得越多——3 件享 85 折，5 件享 8 折。",
+  "Mix & match your favorite sets to build a bundle in your own style.":
+    "自由搭配你喜爱的套组，组出属于你的风格。",
   Add: "加入",
   "Add Bundle to Bag": "套装加入购物袋",
   "You're saving": "已省",

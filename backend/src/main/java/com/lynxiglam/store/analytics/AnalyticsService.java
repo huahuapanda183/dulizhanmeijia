@@ -25,11 +25,20 @@ public class AnalyticsService {
 
     public void track(TrackEventRequest event) {
         if (!TYPES.contains(event.type())) throw new IllegalArgumentException("Unknown analytics event type.");
-        Boolean exists = jdbc.queryForObject(
-                "SELECT EXISTS(SELECT 1 FROM products WHERE handle = :handle)",
-                new MapSqlParameterSource("handle", event.handle()), Boolean.class
+
+        // Resolve the title from the catalog — never from the request body. This
+        // endpoint is unauthenticated, and the previous `title = VALUES(title)` wrote
+        // caller-supplied text straight into the admin report: anyone could POST a
+        // title and change what an admin sees for that product (and a >255-char value
+        // additionally errored under strict mode). Fetching the title here also
+        // replaces the separate EXISTS check — one query instead of two, and an
+        // unknown handle still 404s.
+        List<String> titles = jdbc.queryForList(
+                "SELECT title FROM products WHERE handle = :handle",
+                new MapSqlParameterSource("handle", event.handle()), String.class
         );
-        if (!Boolean.TRUE.equals(exists)) throw new NotFoundException("Product not found: " + event.handle());
+        if (titles.isEmpty()) throw new NotFoundException("Product not found: " + event.handle());
+        String title = titles.getFirst();
 
         String counter = switch (event.type()) {
             case "view" -> "views";
@@ -41,7 +50,7 @@ public class AnalyticsService {
                 "VALUES (:handle, :title, :day, 1) ON DUPLICATE KEY UPDATE " +
                 counter + " = " + counter + " + 1, title = VALUES(title)";
         jdbc.update(sql, new MapSqlParameterSource()
-                .addValue("handle", event.handle()).addValue("title", event.title())
+                .addValue("handle", event.handle()).addValue("title", title)
                 .addValue("day", LocalDate.now(ZoneOffset.UTC)));
     }
 
