@@ -40,6 +40,16 @@ server:
         name: lynxiglam_session
         http-only: true
         same-site: lax
+        # Must be "/" and not the context-path default ("/api").
+        # An earlier revision left this at the default and called it "the tighter
+        # scope"; that was wrong once the storefront needed a server-side gate.
+        # src/proxy.ts guards /admin by forwarding this cookie to /admin/session,
+        # and a /api-scoped cookie is never sent to /admin — the gate could not
+        # see it, so /admin could not be protected server-side at all.
+        # Safe: storefront and API are same-origin in prod (and same host in dev,
+        # since cookies ignore port), the cookie stays HttpOnly + SameSite=Lax,
+        # and Secure is added in the prod profile.
+        path: /
   forward-headers-strategy: framework
 
 management:
