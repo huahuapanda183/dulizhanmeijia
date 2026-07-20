@@ -37,4 +37,4 @@ app:
   # Local-only default admin, seeded by AdminBootstrap (dev/local profiles only).
   admin:
     email: admin@lynxiglam.local
-    password: lynxiglam-admin
+    password: admin@lynxiglam.local

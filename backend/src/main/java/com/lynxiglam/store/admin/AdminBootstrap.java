@@ -25,7 +25,7 @@ public class AdminBootstrap implements ApplicationRunner {
     public AdminBootstrap(
             AdminService admins,
             @Value("${app.admin.email:admin@lynxiglam.local}") String email,
-            @Value("${app.admin.password:lynxiglam-admin}") String password
+            @Value("${app.admin.password:admin@lynxiglam.local}") String password
     ) {
         this.admins = admins;
         this.email = email;

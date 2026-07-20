@@ -63,7 +63,7 @@ npm run dev
 
 注意：`NEXT_PUBLIC_*` 在**构建期被内联**——数据源在构建时就固定了，不是运行时读取。
 
-**开发环境管理员账号**（仅 dev/local profile，由 `AdminBootstrap` 播种）：`admin@lynxiglam.local` / `lynxiglam-admin`。
+**开发环境管理员账号**（仅 dev/local profile，由 `AdminBootstrap` 播种）：`admin@lynxiglam.local` / `admin@lynxiglam.local`。
 
 在 api 模式下访问 `/admin` 会被 `src/proxy.ts` 拦到 `/admin/login`；登录后自动回到原页面。mock 模式下后台整体放行（无后端可校验）。
 

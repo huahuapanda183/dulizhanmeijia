@@ -42,7 +42,7 @@ for p in 3001 8090; do
     && echo "  !! FAIL: ${p} reachable on the public IP" || echo "  PASS: ${p} not public"
 done
 
-echo "=== 5. Active profile is prod (NOT dev — dev seeds admin/lynxiglam-admin) ==="
+echo "=== 5. Active profile is prod (NOT dev/local — those seed a known-password admin) ==="
 journalctl -u lynxiglam-api -b --no-pager | grep -i 'profile' | head -2
 echo "  ^ MUST say: The following 1 profile is active: prod"
 
