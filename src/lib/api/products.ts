@@ -124,6 +124,11 @@ export async function getRecommendations(handle: string, limit = 4): Promise<Pro
 }
 
 export async function getProductsByHandles(handles: string[]): Promise<Product[]> {
+  // An empty list is a normal state (an empty wishlist), not a request to make.
+  // Without this the api branch sent `/products/batch?` with no handle param,
+  // which the backend requires — every visit to an empty wishlist produced a 500.
+  // The mock branch returned [] cleanly, so it was invisible in mock development.
+  if (handles.length === 0) return [];
   if (!usingMock()) {
     const qs = handles.map((h) => `handle=${encodeURIComponent(h)}`).join("&");
     return apiFetch<Product[]>(`/products/batch?${qs}`);

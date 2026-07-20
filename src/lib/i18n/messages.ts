@@ -306,6 +306,9 @@ export const zh: Record<string, string> = {
   Total: "合计",
   FREE: "免费",
   "Loading shipping options…": "正在加载配送方式…",
+  "Couldn't load shipping options. Please refresh and try again.":
+    "配送方式加载失败，请刷新后重试。",
+  "Couldn't check that code. Please try again.": "优惠码校验失败，请重试。",
   "Standard (5–7 business days)": "标准配送（5–7 个工作日）",
   "Express (2–3 business days)": "加急配送（2–3 个工作日）",
   Overnight: "次日达",

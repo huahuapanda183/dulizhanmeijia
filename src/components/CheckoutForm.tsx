@@ -22,6 +22,40 @@ const LAST_ORDER_KEY = "glamnetic-last-order";
 const toCents = (major: number) => Math.round(major * 100);
 const fromCents = (cents: number) => cents / 100;
 
+const IDEMPOTENCY_STORAGE_KEY = "lynxiglam-checkout-idempotency";
+
+/**
+ * One stable idempotency key per (cart + shipping + promo) combination, surviving
+ * reloads. Returns the stored key when the signature is unchanged, otherwise mints
+ * and persists a new one. sessionStorage (not localStorage) so the key dies with
+ * the tab rather than lingering into an unrelated future checkout.
+ */
+function resolveIdempotencyKey(signature: string): string {
+  if (typeof window === "undefined") return "";
+  try {
+    const raw = sessionStorage.getItem(IDEMPOTENCY_STORAGE_KEY);
+    const stored = raw ? (JSON.parse(raw) as { signature?: string; key?: string }) : null;
+    if (stored?.signature === signature && stored.key) return stored.key;
+  } catch {
+    /* unreadable/disabled storage — fall through and mint a fresh key */
+  }
+  const key = crypto.randomUUID();
+  try {
+    sessionStorage.setItem(IDEMPOTENCY_STORAGE_KEY, JSON.stringify({ signature, key }));
+  } catch {
+    /* private mode: the key still works for this mount, just not across a reload */
+  }
+  return key;
+}
+
+function clearIdempotencyKey() {
+  try {
+    sessionStorage.removeItem(IDEMPOTENCY_STORAGE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 const inputClass =
   "w-full border border-line rounded-sm px-3 py-2.5 text-[14px] outline-none focus:border-mauve";
 
@@ -60,16 +94,7 @@ export function CheckoutForm() {
   // when the cart changes: the backend returns the stored order for a repeated
   // key without comparing the payload, so reusing a key after an edit would
   // return the *previous* cart's order.
-  const cartSignature = useMemo(
-    () => lines.map((l) => `${l.handle}:${l.quantity}`).join("|"),
-    [lines],
-  );
-  const idempotencyKey = useRef(crypto.randomUUID());
-  const keyedFor = useRef(cartSignature);
-  if (keyedFor.current !== cartSignature) {
-    keyedFor.current = cartSignature;
-    idempotencyKey.current = crypto.randomUUID();
-  }
+  const [idempotencyKey, setIdempotencyKey] = useState("");
 
   const [form, setForm] = useState<FormState>(INITIAL_FORM);
   const [rates, setRates] = useState<ShippingRate[]>([]);
@@ -82,13 +107,26 @@ export function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
+  const [ratesFailed, setRatesFailed] = useState(false);
+
   useEffect(() => {
     let active = true;
-    getShippingRates(subtotal).then((r) => {
-      if (!active) return;
-      setRates(r);
-      setSelectedRateId((prev) => (prev && r.some((x) => x.id === prev) ? prev : r[0]?.id ?? ""));
-    });
+    setRatesFailed(false);
+    getShippingRates(subtotal)
+      .then((r) => {
+        if (!active) return;
+        setRates(r);
+        setSelectedRateId((prev) => (prev && r.some((x) => x.id === prev) ? prev : r[0]?.id ?? ""));
+      })
+      // Without this the rejection was unhandled: rates stayed empty, the section
+      // showed "Loading shipping options…" forever, and Place Order then blamed the
+      // customer with "Please select a shipping method." A backend outage must not
+      // be presented as user error.
+      .catch(() => {
+        if (!active) return;
+        setRates([]);
+        setRatesFailed(true);
+      });
     return () => {
       active = false;
     };
@@ -98,6 +136,33 @@ export function CheckoutForm() {
     () => rates.find((r) => r.id === selectedRateId) ?? rates[0],
     [rates, selectedRateId],
   );
+
+  // Shipping rate and promo are part of the signature, not just the cart: the server
+  // returns the stored order for a repeated key WITHOUT comparing the payload, so a
+  // retry after switching shipping would otherwise hand back the original order priced
+  // with the old rate.
+  const submissionSignature = useMemo(
+    () =>
+      [
+        lines.map((l) => `${l.handle}:${l.quantity}`).join("|"),
+        selectedRateId,
+        promo?.ok ? promo.code : "",
+      ].join("::"),
+    [lines, selectedRateId, promo],
+  );
+
+  // Persisted in sessionStorage, not just a ref. Held only in memory, a committed
+  // order whose response was lost (proxy timeout, closed tab) left the cart intact
+  // in localStorage while a remount minted a FRESH key — the customer retried and
+  // was charged twice. Surviving the reload makes the retry idempotent as designed.
+  useEffect(() => {
+    // Only once the signature is COMPLETE. Cart lines and shipping rates both
+    // hydrate asynchronously, so the signature passes through "::" and
+    // "la-perle:1::" before settling — resolving on those intermediate states
+    // overwrote the stored key on every reload, which defeated the whole point.
+    if (lines.length === 0 || !selectedRateId) return;
+    setIdempotencyKey(resolveIdempotencyKey(submissionSignature));
+  }, [submissionSignature, lines.length, selectedRateId]);
 
   // A promo is validated against the subtotal at apply-time. If the cart changes
   // afterwards the discount may no longer hold (e.g. GLAM20 needs a $65+ subtotal),
@@ -136,6 +201,11 @@ export function CheckoutForm() {
     try {
       setPromo(await applyPromoCode(code, subtotal));
       promoSubtotal.current = subtotal;
+    } catch {
+      // try/finally with no catch meant a failed request left the button un-pending
+      // and nothing on screen — Apply appeared to do nothing at all.
+      setPromo({ ok: false, code, amount: 0, message: t("Couldn't check that code. Please try again.") });
+      promoSubtotal.current = null;
     } finally {
       setPromoPending(false);
     }
@@ -189,7 +259,8 @@ export function CheckoutForm() {
         shippingAddress,
         shippingRateId: selectedRate.id,
         promoCode: promo?.ok ? promo.code : undefined,
-        idempotencyKey: idempotencyKey.current,
+        // Fall back only if the effect somehow has not run yet; it still persists.
+        idempotencyKey: idempotencyKey || resolveIdempotencyKey(submissionSignature),
       });
     } catch (err) {
       // Surface what the server actually objected to. The uniform error envelope
@@ -212,6 +283,9 @@ export function CheckoutForm() {
     } catch {
       /* storage full / private mode — the confirmation page degrades, the order stands */
     }
+    // Retire the key only once the order is safely committed, so the next checkout
+    // starts fresh instead of replaying this one.
+    clearIdempotencyKey();
     clear();
     router.push("/checkout/confirmation");
   }
@@ -287,7 +361,13 @@ export function CheckoutForm() {
               <h2 className="text-[18px] font-medium text-ink">{t("Shipping method")}</h2>
               <div className="mt-4 space-y-3">
                 {rates.length === 0 ? (
-                  <p className="text-[14px] text-body">{t("Loading shipping options…")}</p>
+                  ratesFailed ? (
+                    <p className="text-[14px] text-red-600" role="alert">
+                      {t("Couldn't load shipping options. Please refresh and try again.")}
+                    </p>
+                  ) : (
+                    <p className="text-[14px] text-body">{t("Loading shipping options…")}</p>
+                  )
                 ) : (
                   rates.map((rate) => {
                     const active = rate.id === selectedRateId;

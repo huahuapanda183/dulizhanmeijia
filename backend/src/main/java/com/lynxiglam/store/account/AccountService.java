@@ -1,5 +1,6 @@
 package com.lynxiglam.store.account;
 
+import com.lynxiglam.store.common.NotFoundException;
 import com.lynxiglam.store.common.dto.Dtos.ActionResultDto;
 import com.lynxiglam.store.common.dto.Dtos.AuthRequest;
 import com.lynxiglam.store.common.dto.Dtos.SubscribeRequest;
@@ -12,13 +13,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
 public class AccountService {
+    /** Bounds a client-supplied list so one request cannot write unboundedly. */
+    private static final int MAX_WISHLIST_ITEMS = 200;
+
     private final NamedParameterJdbcTemplate jdbc;
     private final PasswordEncoder passwordEncoder;
 
@@ -79,10 +86,40 @@ public class AccountService {
         );
     }
 
+    /**
+     * Replaces the customer's wishlist.
+     *
+     * Validates before writing. Previously every row went straight to INSERT, so an
+     * unknown handle hit the product foreign key and a repeated handle hit the
+     * primary key — both surfaced to the client as an opaque 500 for what is plainly
+     * a bad request. Duplicates are a normal client artefact (a list synced from
+     * localStorage), so they are de-duplicated rather than rejected.
+     */
     @Transactional
     public void saveWishlist(String customerId, List<WishlistItemDto> items) {
-        jdbc.update("DELETE FROM wishlist_items WHERE customer_id = :customerId", new MapSqlParameterSource("customerId", customerId));
+        List<WishlistItemDto> unique = new ArrayList<>();
+        Set<String> seen = new LinkedHashSet<>();
         for (WishlistItemDto item : items) {
+            if (item == null || item.handle() == null || item.handle().isBlank()) {
+                throw new IllegalArgumentException("Wishlist items must each have a product handle.");
+            }
+            if (seen.add(item.handle())) unique.add(item);
+        }
+        if (unique.size() > MAX_WISHLIST_ITEMS) {
+            throw new IllegalArgumentException("A wishlist may hold at most " + MAX_WISHLIST_ITEMS + " items.");
+        }
+        for (WishlistItemDto item : unique) {
+            Boolean exists = jdbc.queryForObject(
+                    "SELECT EXISTS(SELECT 1 FROM products WHERE handle = :handle)",
+                    new MapSqlParameterSource("handle", item.handle()), Boolean.class
+            );
+            if (!Boolean.TRUE.equals(exists)) {
+                throw new NotFoundException("Product not found: " + item.handle());
+            }
+        }
+
+        jdbc.update("DELETE FROM wishlist_items WHERE customer_id = :customerId", new MapSqlParameterSource("customerId", customerId));
+        for (WishlistItemDto item : unique) {
             jdbc.update(
                     "INSERT INTO wishlist_items (customer_id, product_handle, added_at) VALUES (:customerId, :handle, :addedAt)",
                     new MapSqlParameterSource().addValue("customerId", customerId).addValue("handle", item.handle())
