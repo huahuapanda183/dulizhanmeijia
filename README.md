@@ -65,6 +65,8 @@ npm run dev
 
 **开发环境管理员账号**（仅 dev/local profile，由 `AdminBootstrap` 播种）：`admin@lynxiglam.local` / `lynxiglam-admin`。
 
+在 api 模式下访问 `/admin` 会被 `src/proxy.ts` 拦到 `/admin/login`；登录后自动回到原页面。mock 模式下后台整体放行（无后端可校验）。
+
 ## 测试
 
 ```bash
@@ -80,6 +82,7 @@ cd backend && ./mvnw test      # 45 个白盒测试
 - **金额用整数分**存储于数据库，出参为 `BigDecimal` 主单位。服务端不对金额做浮点运算。
 - **下单幂等** —— 客户端每次提交生成一个 UUID，数据库唯一约束保证重试（含并发重试）返回既有订单而不会重复建单。
 - **统一错误信封**（`{code, message, fields, timestamp}`）。前端抛出带类型的 `ApiError`；404 转为 `null`，401 表示未登录，5xx 与网络错误绝不被掩盖。
+- **后台两层防护。** `src/proxy.ts`（Next 16 的 proxy —— `middleware` 文件约定在 16 中已废弃更名）在渲染前拦截 `/admin/*`，把会话 Cookie 转给后端 `/admin/session` 做真实校验；后端对管理数据本身另有 `ROLE_ADMIN` 强制。两层独立，任一层都不是唯一依靠。
 - **刻意不接支付。** `orders.payment_intent_id` 字段为后续支付方预留。
 
 完整端点清单见 [`docs/API_CONTRACT.md`](docs/API_CONTRACT.md)。
@@ -97,11 +100,11 @@ cd backend && ./mvnw test      # 45 个白盒测试
 代码与本地联调已就绪，但**尚未部署**。仍需处理：
 
 - **必须处理**：第三方素材与品牌/商标引用需替换为自有或已授权内容；伪造的评价、未经授权的认证/奖项/零售商/媒体声明需移除；结算页无后端对接的银行卡号输入框需移除。
-- **必须处理**：`/admin` 没有服务端鉴权（客户端 `AdminGate` 仅是交互层面），需补 `src/middleware.ts` 守卫。后端 `/analytics` 已有会话鉴权。
 - **部署本身**：见 [`deploy/RUNBOOK.md`](deploy/RUNBOOK.md)。目标是共享生产机，每个改动共享机的步骤都需明确授权。
 
 已解决（早期版本的阻断项，现已处理，此处备忘）：
 
+- `/admin` 已有**服务端**鉴权：`src/proxy.ts` 在页面渲染前校验管理员会话（未认证 307 跳 `/admin/login`，失败一律 fail closed）。后端 `/analytics` 的 `ROLE_ADMIN` 校验仍是权威层。
 - Spring 默认 profile 已改为 `prod`（fail-safe，缺 DB 变量即启动报错）；prod 首个管理员由 `AdminProvisionRunner` 开通（见 RUNBOOK）。
 - 限流与部署自动化已设计（`deploy/` 下的 nginx 限流区 + systemd + CI）——尚待在服务器上执行。
 - 店铺路由的静态预渲染陈旧问题已修（首页与 PDP 加 `revalidate = 0`）。
