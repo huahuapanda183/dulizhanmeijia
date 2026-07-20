@@ -6,9 +6,15 @@ production host that already runs three other projects, has **Swap = 0**, and a
 MySQL connection ceiling that has already been hit. Read
 [`RUNBOOK.md`](RUNBOOK.md) before touching anything.
 
-> Nothing in this directory has been executed. No server was contacted to
-> produce it. Every step that changes the shared host is marked 🔴 in the runbook
-> and requires the user's explicit authorization.
+> No server was contacted to produce this, and nothing here has been run against
+> the shared host. Every step that changes it is marked 🔴 in the runbook and
+> requires the user's explicit authorization.
+>
+> **Phases 2–3 have been rehearsed locally** (2026-07-20) against a disposable
+> MySQL on `127.0.0.1:3307`: `mysql/001-bootstrap.sql`, the least-privilege
+> isolation proof, the Flyway migration and the data assertions all ran and
+> produced the documented output. See "Local rehearsal" in
+> [`RUNBOOK.md`](RUNBOOK.md) for how to redo it and the two gotchas it surfaced.
 
 ## Files
 

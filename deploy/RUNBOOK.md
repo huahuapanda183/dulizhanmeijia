@@ -55,6 +55,12 @@ A "build first, then deploy" order simply does not work here.
 
 ### Phase 2 — Database
 
+> **Rehearsed locally on 2026-07-20.** Steps 6–9 were run end-to-end against a
+> throwaway MySQL instance on `127.0.0.1:3307` (see "Local rehearsal" at the end of
+> this file). The bootstrap SQL, the isolation proof, the Flyway migration and the
+> data assertions below all produced the expected output there, so what follows is
+> tested, not theoretical. Two gotchas it surfaced are noted inline.
+
 6. 🔴 **MySQL bootstrap** — `sudo mysql --user=root -p < deploy/mysql/001-bootstrap.sql`
    (after replacing both password placeholders with `openssl rand -base64 32`).
    Creates the `lynxiglam` DB + two least-privilege users, **and applies
@@ -64,8 +70,21 @@ A "build first, then deploy" order simply does not work here.
    mysql -h 127.0.0.1 -u lynxiglam -p -e "SHOW DATABASES;"   # ONLY information_schema + lynxiglam
    mysql -h 127.0.0.1 -u lynxiglam -p -e "USE podsys;"       # MUST be ERROR 1044
    mysql -h 127.0.0.1 -u lynxiglam -p -e "USE kejing;"       # MUST be ERROR 1044
+   mysql -h 127.0.0.1 -u lynxiglam -p -e "SELECT * FROM podsys.<any_table>;"  # MUST be ERROR 1142
    ```
-   If either `USE` succeeds: STOP, revoke, report.
+   If either `USE` succeeds: STOP, revoke, report. The fourth line matters
+   independently: `USE` being denied does not by itself prove a fully-qualified
+   `SELECT` is. In rehearsal both were denied (1044 and 1142 respectively) — check
+   both, because they are separate privilege paths.
+
+   Expected `SHOW GRANTS FOR 'lynxiglam'@'127.0.0.1'` (verified in rehearsal):
+   ```
+   GRANT USAGE ON *.* TO `lynxiglam`@`127.0.0.1`
+   GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, DROP, REFERENCES, INDEX, ALTER,
+         CREATE TEMPORARY TABLES ON `lynxiglam`.* TO `lynxiglam`@`127.0.0.1`
+   ```
+   `USAGE ON *.*` is the no-privilege placeholder every account has — that line is
+   expected. Any OTHER `ON *.*` line carrying a real privilege means STOP.
 7. 🔴 **Secrets**: install `deploy/lynxiglam.env.example` → `/etc/lynxiglam/lynxiglam.env`,
    fill in `DB_PASSWORD`, then `chown root:root && chmod 600`. Verify:
    `sudo stat -c '%U:%G %a' /etc/lynxiglam/lynxiglam.env` → `root:root 600`.
@@ -91,6 +110,23 @@ A "build first, then deploy" order simply does not work here.
    curl -s 127.0.0.1:8090/api/products/handles | head -c 200
    ```
    Then re-check `Threads_connected` — it must have risen by ≤ 8.
+
+   **Prove the migration actually landed** (these exact numbers were verified in
+   the local rehearsal against real MySQL, and match the CI assertions):
+   ```
+   mysql -h 127.0.0.1 -u lynxiglam -p lynxiglam -e "
+     SELECT installed_rank, version, description, success FROM flyway_schema_history ORDER BY installed_rank;
+     SELECT (SELECT COUNT(*) FROM products) products, (SELECT COUNT(*) FROM collections) collections,
+            (SELECT COUNT(*) FROM reviews) reviews, (SELECT COUNT(*) FROM pages) pages,
+            (SELECT COUNT(*) FROM shipping_rates) rates, (SELECT COUNT(*) FROM promo_codes) promos;
+     SELECT COUNT(*) bad_dates FROM products WHERE created_at IS NULL OR YEAR(created_at) < 2000;
+     SELECT COUNT(*) failed FROM flyway_schema_history WHERE success = 0;"
+   ```
+   Expect: two rows (v1 schema, v2 seed) both `success=1`; **32 / 24 / 8 / 15 / 3 / 4**;
+   `bad_dates = 0`; `failed = 0`.
+   `bad_dates` is the tripwire for the datetime-literal bug fixed in `af6c52e` —
+   MySQL in strict mode rejects the ISO-8601 `…Z` form that H2 accepts, so a
+   regression there would show up here and nowhere else.
 
 ### Phase 4 — nginx + TLS
 
@@ -246,6 +282,8 @@ public internet in under a minute and touch no neighbour.
    Wrong form = parse error = reload blocked for every tenant (`nginx -t` catches it).
 3. **`mysqldump --single-transaction` privileges** — 8.0.32+ may demand a global
    privilege; the script falls back to `--lock-tables`. Run the first backup by hand.
+   Still unverified: the local rehearsal covered bootstrap + migration, **not** the
+   backup path, and the dev box is 8.4 anyway (see "Local rehearsal" gotcha 2).
 4. **`SystemCallFilter=@system-service`** with the JVM/Node — normally fine; if a
    unit dies instantly with `SIGSYS`, comment it out and re-add narrowed. Do NOT
    debug this by removing the memory caps.
@@ -257,6 +295,53 @@ public internet in under a minute and touch no neighbour.
    (payment deferred). A future Stripe/webhook integration MUST relax this.
 8. **Free RAM / connection headroom** — the recorded ~17 G free / 300-301 conns is
    a stale snapshot. Step 1 re-measures.
+
+## Local rehearsal (done 2026-07-20) — how to redo it
+
+Phase 2–3 were rehearsed against a disposable MySQL on `127.0.0.1:3307`, entirely
+separate from the dev box's own MySQL (`MySQLPodsys`, port 3306, another project's
+database — never touched). Worth redoing after any change to `V1`/`V2` or the
+bootstrap SQL, because **H2 accepts SQL that real MySQL rejects**.
+
+```powershell
+# 1. Config for a second instance — separate datadir, port, error log.
+#    Use a directory name that cannot be confused with the existing instance's.
+#    (Here: D:\lynxiglam-mysql, while the neighbour lives in D:\mysql-local.)
+#    Key settings: port=3307, bind-address=127.0.0.1, mysqlx=OFF,
+#    collation-server=utf8mb4_0900_ai_ci, innodb_buffer_pool_size=256M
+# 2. Initialise + start (never point --initialize at an existing datadir):
+& "$MYSQL_HOME\bin\mysqld.exe" --defaults-file=D:\lynxiglam-mysql\my.ini --initialize-insecure
+Start-Process "$MYSQL_HOME\bin\mysqld.exe" -ArgumentList "--defaults-file=D:\lynxiglam-mysql\my.ini"
+# 3. Run the REAL bootstrap (substitute the password placeholders first):
+Get-Content bootstrap.sql -Raw | & "$MYSQL_HOME\bin\mysql.exe" -h 127.0.0.1 -P 3307 -u root --skip-password
+# 4. Point the app at it and let Flyway migrate:
+#    cp application-local.yml.example -> application-local.yml (port 3307, generated password)
+.\mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=local
+# 5. Run the Phase 2 isolation proof and the Phase 3 data assertions above.
+# 6. Tear down: stop the process, delete D:\lynxiglam-mysql.
+```
+
+To rehearse the isolation proof without a real neighbour DB, create a decoy
+(`CREATE DATABASE podsys; CREATE TABLE podsys.secret(...)`), confirm the app user
+gets 1044/1142, then drop it.
+
+### Two gotchas this rehearsal surfaced
+
+1. **Do not set `skip_name_resolve=ON` on a freshly initialised instance.**
+   `--initialize-insecure` creates only `root@localhost`; with name resolution off
+   the server sees the literal IP `127.0.0.1`, which that account does not match,
+   and every connection fails `ERROR 1130 (HY000): Host '127.0.0.1' is not allowed
+   to connect`. Leave it off (or create `root@127.0.0.1` first). IP-form accounts
+   like `lynxiglam@127.0.0.1` work either way. Not an issue on the production host,
+   where the instance and its root account already exist — this bites only when
+   standing up a new instance.
+2. **The dev box runs MySQL 8.4; production runs 8.0.** Flyway logs
+   `Using MySQL 8.4 which is newer than the version Flyway has been verified with`
+   during the rehearsal. The rehearsal therefore validates the *procedure*, not
+   version-specific behaviour. **The authority on 8.0 compatibility is the
+   `mysql:8.0` service-container job in CI**, which runs the same migrations
+   against production's exact version. Do not conclude "it works on MySQL" from a
+   green local rehearsal alone.
 
 ## The one improvement worth making to this plan
 
