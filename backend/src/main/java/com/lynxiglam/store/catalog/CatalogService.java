@@ -46,7 +46,11 @@ public class CatalogService {
     public List<ProductDto> findProducts(ProductQuery query) {
         MapSqlParameterSource params = new MapSqlParameterSource();
         String where = buildWhere(query, params);
-        String order = SORTS.getOrDefault(query.sort(), SORTS.get("featured"));
+        // Append p.id so every sort is a TOTAL order. Today's data happens to have
+        // no ties on featured_position, but "rating" and "best-selling" can tie, and
+        // an unstable ORDER BY under LIMIT/OFFSET makes paging lose and duplicate
+        // rows between pages. Correctness here must not rest on incidental data.
+        String order = SORTS.getOrDefault(query.sort(), SORTS.get("featured")) + ", p.id ASC";
         StringBuilder sql = new StringBuilder(BASE_SELECT).append(where).append(" ORDER BY ").append(order);
 
         // Reject out-of-range paging instead of silently ignoring it. positive()

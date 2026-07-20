@@ -21,7 +21,6 @@ import java.util.List;
 
 @RestController
 public class AccountController {
-    private static final String CUSTOMER_ID = "customerId";
     private final AccountService accounts;
 
     public AccountController(AccountService accounts) {
@@ -41,7 +40,7 @@ public class AccountController {
         }
         HttpSession session = request.getSession(true);
         request.changeSessionId();
-        session.setAttribute(CUSTOMER_ID, credentials.get().id());
+        session.setAttribute(CustomerSession.ID_ATTRIBUTE, credentials.get().id());
         return new ActionResultDto(true, "Signed in.");
     }
 
@@ -62,7 +61,7 @@ public class AccountController {
     }
 
     private String customerId(HttpSession session) {
-        Object customerId = session.getAttribute(CUSTOMER_ID);
+        Object customerId = session.getAttribute(CustomerSession.ID_ATTRIBUTE);
         if (customerId == null) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sign in required.");
         return customerId.toString();
     }

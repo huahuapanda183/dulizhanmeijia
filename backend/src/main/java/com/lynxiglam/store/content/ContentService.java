@@ -24,14 +24,25 @@ public class ContentService {
     }
 
     public List<ReviewDto> reviews(String productHandle) {
-        String sql = "SELECT id, author, rating, title, body, product_handle, product_title, product_image, verified, created_at " +
-                "FROM reviews";
+        // reviews.product_title / product_image are denormalized copies that nothing
+        // keeps in sync — three seeded rows already named the wrong product, so a
+        // review of "Citrus Coast" was shown attributed to "Galactic". Prefer the
+        // live catalog and fall back to the stored copy only when the product is
+        // gone, so reviews of a delisted product still render.
+        String sql = "SELECT r.id, r.author, r.rating, r.title, r.body, r.product_handle, " +
+                "COALESCE(p.title, r.product_title) product_title, " +
+                "COALESCE(pi.url, r.product_image) product_image, " +
+                "r.verified, r.created_at " +
+                "FROM reviews r " +
+                "LEFT JOIN products p ON p.handle = r.product_handle " +
+                "LEFT JOIN product_images pi ON pi.product_id = p.id AND pi.position = " +
+                "(SELECT MIN(position) FROM product_images WHERE product_id = p.id)";
         MapSqlParameterSource params = new MapSqlParameterSource();
         if (productHandle != null && !productHandle.isBlank()) {
-            sql += " WHERE product_handle = :productHandle";
+            sql += " WHERE r.product_handle = :productHandle";
             params.addValue("productHandle", productHandle);
         }
-        sql += " ORDER BY created_at DESC";
+        sql += " ORDER BY r.created_at DESC, r.id ASC";
         return jdbc.query(sql, params, (rs, rowNum) -> new ReviewDto(
                 rs.getString("id"), rs.getString("author"), rs.getBigDecimal("rating"),
                 rs.getString("title"), rs.getString("body"), rs.getString("product_handle"),

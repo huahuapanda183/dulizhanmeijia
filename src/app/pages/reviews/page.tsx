@@ -6,6 +6,11 @@ import { VerifiedIcon } from "@/components/icons";
 import { getReviews, getReviewSummary } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 
+// Serve from cache but re-fetch every 5 minutes. Previously this page was
+// prerendered at build with no refresh path at all, so newly published
+// content never appeared until the next deploy.
+export const revalidate = 300;
+
 export const metadata = { title: "Reviews | LynxiGlam" };
 
 export default async function ReviewsPage() {

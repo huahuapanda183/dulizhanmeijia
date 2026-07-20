@@ -1,5 +1,6 @@
 package com.lynxiglam.store.admin;
 
+import com.lynxiglam.store.account.CustomerSession;
 import com.lynxiglam.store.common.dto.Dtos.ActionResultDto;
 import com.lynxiglam.store.common.dto.Dtos.AdminSessionDto;
 import com.lynxiglam.store.common.dto.Dtos.AuthRequest;
@@ -41,7 +42,21 @@ public class AdminController {
     @PostMapping("/admin/logout")
     ActionResultDto logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
-        if (session != null) session.invalidate();
+        if (session == null) return new ActionResultDto(true, "Signed out.");
+
+        // Drop only the admin half. The customer login lives in the SAME
+        // HttpSession, so invalidate() also signed the shopper out — an admin
+        // who was browsing the storefront lost their cart session and wishlist
+        // access by signing out of the dashboard.
+        session.removeAttribute(AdminSession.ID_ATTRIBUTE);
+        session.removeAttribute(AdminSession.EMAIL_ATTRIBUTE);
+        if (session.getAttribute(CustomerSession.ID_ATTRIBUTE) == null) {
+            session.invalidate();
+        } else {
+            // Nothing admin-owned is left, but rotate anyway so a stolen
+            // pre-logout session id cannot be replayed against the account.
+            request.changeSessionId();
+        }
         return new ActionResultDto(true, "Signed out.");
     }
 

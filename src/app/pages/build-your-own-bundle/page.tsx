@@ -6,6 +6,11 @@ import { BundleBuilder } from "@/components/BundleBuilder";
 import { getProducts } from "@/lib/api";
 import { T } from "@/lib/i18n/i18n-context";
 
+// Rendered per request. Without this the page is prerendered ONCE at build
+// time and the catalog is frozen into the HTML: adding or repricing a product
+// never showed up until the next deploy.
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = { title: "Build Your Own Nail Bundle | LynxiGlam" };
 
 export default async function BuildYourOwnBundlePage() {

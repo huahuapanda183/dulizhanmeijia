@@ -31,6 +31,24 @@ export async function getShippingRates(subtotal = 0, address?: Address): Promise
   ];
 }
 
+/**
+ * Mirrors the `promo_codes` table: kind + value-in-cents + optional minimum.
+ * Previously each payout was a float expression (`+(s * 0.15).toFixed(2)`), which
+ * drifted from the backend's HALF_UP-on-integer-cents by a cent at some subtotals.
+ */
+const MOCK_PROMOS: Record<string, { kind: "percent" | "fixed" | "free_ship"; value: number; min?: number }> = {
+  WELCOME10: { kind: "percent", value: 10 },
+  GLAM20: { kind: "fixed", value: 2000, min: 6500 },
+  FREESHIP: { kind: "free_ship", value: 0 },
+  SAVE15: { kind: "percent", value: 15 },
+};
+
+const FREE_SHIPPING_CODES = new Set(
+  Object.entries(MOCK_PROMOS)
+    .filter(([, p]) => p.kind === "free_ship")
+    .map(([code]) => code),
+);
+
 /** Mock promo codes. Replace with a real validation endpoint later. */
 export async function applyPromoCode(code: string, subtotal: number): Promise<PromoResult> {
   if (!usingMock()) {
@@ -40,24 +58,35 @@ export async function applyPromoCode(code: string, subtotal: number): Promise<Pr
     });
   }
   const normalized = code.trim().toUpperCase();
-  const CODES: Record<string, (s: number) => number> = {
-    WELCOME10: (s) => +(s * 0.1).toFixed(2),
-    GLAM20: (s) => (s >= 65 ? 20 : 0),
-    FREESHIP: () => 0, // handled as free shipping at checkout; no line discount
-    SAVE15: (s) => +(s * 0.15).toFixed(2),
-  };
-  if (!(normalized in CODES)) {
+  const promo = MOCK_PROMOS[normalized];
+  if (!promo) {
     return { ok: false, code: normalized, amount: 0, message: "That code isn't valid." };
   }
-  if (normalized === "GLAM20" && subtotal < 65) {
-    return { ok: false, code: normalized, amount: 0, message: "GLAM20 requires a $65+ subtotal." };
+  const subtotalCents = Math.round(subtotal * 100);
+  if (promo.min != null && subtotalCents < promo.min) {
+    return {
+      ok: false,
+      code: normalized,
+      amount: 0,
+      message: `${normalized} requires a $${(promo.min / 100).toFixed(2)}+ subtotal.`,
+    };
   }
-  const amount = CODES[normalized](subtotal);
+  // Integer cents, HALF_UP, clamped at the subtotal — same three rules as Money.percentage.
+  const amountCents =
+    promo.kind === "percent"
+      ? Math.min(subtotalCents, Math.round((subtotalCents * promo.value) / 100))
+      : promo.kind === "fixed"
+        ? Math.min(subtotalCents, promo.value)
+        : 0;
+  const amount = amountCents / 100;
   return {
     ok: true,
     code: normalized,
     amount,
-    message: normalized === "FREESHIP" ? "Free shipping applied!" : `Code applied — you saved $${amount.toFixed(2)}.`,
+    message:
+      promo.kind === "free_ship"
+        ? "Free shipping applied!"
+        : `Code applied — you saved $${amount.toFixed(2)}.`,
   };
 }
 
@@ -105,7 +134,8 @@ export async function createOrder(input: OrderInput): Promise<Order> {
     // silently dropped. Ignoring it charged full price behind a success response,
     // so the customer believed a discount had applied.
     if (!promo.ok) throw new Error(promo.message);
-    if (promo.code === "FREESHIP") shipping = 0;
+    // By kind, like CheckoutService.isFreeShipping — not by the literal name.
+    if (FREE_SHIPPING_CODES.has(promo.code)) shipping = 0;
     else discount = promo.amount;
   }
 

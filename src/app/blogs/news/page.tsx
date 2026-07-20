@@ -5,6 +5,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getBlogPosts } from "@/lib/api";
 
+// Serve from cache but re-fetch every 5 minutes. Previously this page was
+// prerendered at build with no refresh path at all, so newly published
+// content never appeared until the next deploy.
+export const revalidate = 300;
+
 export const metadata: Metadata = { title: "Blog | LynxiGlam" };
 
 export default async function BlogPage() {

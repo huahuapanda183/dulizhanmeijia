@@ -116,7 +116,11 @@ public class CheckoutService {
                     code + " requires a $" + Money.fromCents(promo.minSubtotalCents()) + "+ subtotal.");
         }
         int amount = switch (promo.kind()) {
-            case "percent" -> Money.percentage(subtotalCents, promo.value());
+            // Clamp like "fixed" already did. Nothing constrains promo_codes.value
+            // to 0-100, and a mis-keyed 150 produced a discount larger than the
+            // subtotal: the order persisted discount_cents > subtotal_cents, which
+            // reads as a refund the customer never received.
+            case "percent" -> Math.min(subtotalCents, Money.percentage(subtotalCents, promo.value()));
             case "fixed" -> Math.min(subtotalCents, promo.value());
             case "free_ship" -> 0;
             default -> throw new IllegalArgumentException("Unsupported promo kind: " + promo.kind());

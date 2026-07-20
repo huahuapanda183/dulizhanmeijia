@@ -13,11 +13,10 @@ export default function AdminOrdersPage() {
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#f7f7f8] text-[26px]">
             🧾
           </div>
-          <h2 className="text-[18px] font-semibold text-ink"><T k="No orders yet" /></h2>
+          <h2 className="text-[18px] font-semibold text-ink"><T k="This view isn't built yet" /></h2>
           <p className="mt-2 text-[14px] leading-relaxed text-body">
-            <T k="Orders will appear here once a payment backend is connected." /> The checkout flow already
-            builds order objects via <code className="rounded-sm bg-[#f7f7f8] px-1 py-0.5 text-[13px] text-ink">createOrder()</code> — see{" "}
-            <code className="rounded-sm bg-[#f7f7f8] px-1 py-0.5 text-[13px] text-ink">docs/API_CONTRACT.md</code>.
+            <T k="Orders are already being placed and stored — there is just no admin list to read them with yet." />{" "}
+            <T k="Query the orders table directly until this page is wired to a read endpoint." />
           </p>
         </div>
       </div>

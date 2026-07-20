@@ -5,6 +5,11 @@ import { AnalyticsOverview } from "@/components/admin/AnalyticsOverview";
 import { AdminGate } from "@/components/admin/AdminGate";
 import { T } from "@/lib/i18n/i18n-context";
 
+// Rendered per request. Without this the dashboard is prerendered ONCE at
+// build time, so the product and collection counts are frozen at whatever
+// the catalog held on the day of the deploy.
+export const dynamic = "force-dynamic";
+
 function StatCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-md border border-line bg-white p-5">

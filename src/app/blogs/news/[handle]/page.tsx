@@ -6,6 +6,11 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { getBlogPosts, getBlogPost } from "@/lib/api";
 
+// Serve from cache but re-fetch every 5 minutes. Previously this page was
+// prerendered at build with no refresh path at all, so newly published
+// content never appeared until the next deploy.
+export const revalidate = 300;
+
 type Params = { params: Promise<{ handle: string }> };
 
 export async function generateStaticParams() {

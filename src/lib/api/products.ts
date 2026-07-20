@@ -5,19 +5,23 @@ import { ApiError, apiFetch, usingMock } from "./config";
 /** Backend `/products/facets` only scopes by collection + search (see CatalogService). */
 type FacetQuery = Pick<ProductQuery, "collection" | "search">;
 
+// Every comparator falls through to `handle` so the order is total, matching the
+// backend's `, p.id ASC` tiebreak. Without it, ties resolve differently on each
+// side and a paged list can repeat one product while dropping another.
 function sortProducts(list: Product[], sort: SortKey = "featured"): Product[] {
+  const byHandle = (a: Product, b: Product) => a.handle.localeCompare(b.handle);
   const out = [...list];
   switch (sort) {
     case "price-asc":
-      return out.sort((a, b) => a.price - b.price);
+      return out.sort((a, b) => a.price - b.price || byHandle(a, b));
     case "price-desc":
-      return out.sort((a, b) => b.price - a.price);
+      return out.sort((a, b) => b.price - a.price || byHandle(a, b));
     case "rating":
-      return out.sort((a, b) => b.rating - a.rating);
+      return out.sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount || byHandle(a, b));
     case "best-selling":
-      return out.sort((a, b) => b.reviewCount - a.reviewCount);
+      return out.sort((a, b) => b.reviewCount - a.reviewCount || b.rating - a.rating || byHandle(a, b));
     case "newest":
-      return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt) || byHandle(a, b));
     default:
       return out;
   }
@@ -34,7 +38,10 @@ function applyFilters(list: Product[], query: ProductQuery): Product[] {
       (p) =>
         p.title.toLowerCase().includes(q) ||
         p.shape.toLowerCase().includes(q) ||
-        p.tags.some((t) => t.includes(q)),
+        // Lowercase BOTH sides. Only `q` was folded, so a capitalised tag never
+        // matched — the backend's LOWER(tag) LIKE ... did, and mock search
+        // returned fewer results than the API for the same query.
+        p.tags.some((t) => t.toLowerCase().includes(q)),
     );
   }
   if (query.shapes?.length) out = out.filter((p) => query.shapes!.includes(p.shape));

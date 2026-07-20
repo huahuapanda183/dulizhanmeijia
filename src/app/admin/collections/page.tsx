@@ -3,6 +3,11 @@ import { getCollections } from "@/lib/api";
 import { formatCount } from "@/lib/format";
 import { T } from "@/lib/i18n/i18n-context";
 
+// Rendered per request. Without this the page is prerendered ONCE at build
+// time and the catalog is frozen into the HTML: adding or repricing a product
+// never showed up until the next deploy.
+export const dynamic = "force-dynamic";
+
 export default async function AdminCollectionsPage() {
   const collections = await getCollections();
 

@@ -70,9 +70,6 @@ springdoc:
 
 app:
   storefront-origin: ${STOREFRONT_ORIGIN:http://localhost:3000}
-  security:
-    session-cookie-name: lynxiglam_session
-    admin-cookie-name: lynxiglam_admin_session
   commerce:
     free-shipping-threshold-cents: 6500
     tax-rate: 0.0725

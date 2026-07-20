@@ -121,14 +121,10 @@ export const zh: Record<string, string> = {
   "View": "查看",
   Title: "标题",
   Handle: "标识",
-  "No orders yet": "暂无订单",
-  "No customers yet": "暂无客户",
-  "Orders will appear here once a payment backend is connected.": "接入支付后端后，订单将显示在这里。",
   "Customers will appear here once the backend is connected.": "接入后端后，客户将显示在这里。",
   "Manage your catalog — search, review, and edit products.": "管理你的商品目录——搜索、查看与编辑商品。",
   "Track and fulfill customer orders.": "跟踪并履行客户订单。",
   "View and manage your customer base.": "查看与管理你的客户群。",
-  "Customer profiles will appear here once accounts and a payment backend are connected.": "接入账户与支付后端后，客户资料将显示在这里。",
   "collections in your store.": "个集合。",
   "Reset data": "重置数据",
   "No analytics yet — browse the storefront to generate data.": "暂无数据 — 去前台浏览商品即可生成数据。",
@@ -373,6 +369,11 @@ export const zh: Record<string, string> = {
     "可重复使用的磁吸假睫毛，无需胶水、几秒即可佩戴——只需搭配磁吸眼线。每副可佩戴多达 60 次。",
   "The magnetic liner that holds LynxiGlam lashes in place all day. Smudge-proof, easy to apply and easy to remove.":
     "全天固定 LynxiGlam 假睫毛的磁吸眼线。防晕染，易上手、易卸除。",
+  "This view isn't built yet": "该页面尚未开发",
+  "Orders are already being placed and stored — there is just no admin list to read them with yet.": "订单已经可以正常下单并入库，只是后台还没有做查看列表。",
+  "Customers can already register and sign in — there is just no admin list to read them with yet.": "客户已经可以注册和登录，只是后台还没有做查看列表。",
+  "Query the orders table directly until this page is wired to a read endpoint.": "在本页接入查询接口之前，请直接查 orders 表。",
+  "Query the customers table directly until this page is wired to a read endpoint.": "在本页接入查询接口之前，请直接查 customers 表。",
 };
 
 export function translate(locale: Locale, key: string): string {
