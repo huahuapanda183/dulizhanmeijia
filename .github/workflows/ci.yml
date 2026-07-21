@@ -22,9 +22,31 @@ jobs:
 
       # Build against the mock data source so CI stays green without a backend.
       # NEXT_PUBLIC_* is inlined at build time, so it must be set here explicitly.
+      #
+      # LYNXIGLAM_ALLOW_MOCK_BUILD is the explicit opt-out for the guard in
+      # next.config.ts. That guard exists because a mock PRODUCTION build ships a
+      # completely open /admin: the proxy gate folds to `return next()` at compile
+      # time. CI artifacts are never deployed, so opting out here is safe — but it
+      # has to be stated, not assumed.
       - run: npm run check
         env:
           NEXT_PUBLIC_DATA_SOURCE: mock
+          LYNXIGLAM_ALLOW_MOCK_BUILD: "1"
+
+      # Prove the guard actually fires. Without this, the guard could be silently
+      # broken (typo'd env name, refactored away) and nothing would notice until
+      # an open build reached the internet.
+      - name: The mock-build guard must refuse a build without the opt-out
+        env:
+          NEXT_PUBLIC_DATA_SOURCE: mock
+        run: |
+          if npx next build > /tmp/guard.log 2>&1; then
+            echo "FAIL: a mock production build succeeded — the guard in next.config.ts is not working"
+            exit 1
+          fi
+          grep -q "Refusing to build" /tmp/guard.log \
+            || { echo "FAIL: build failed, but not for the expected reason:"; tail -20 /tmp/guard.log; exit 1; }
+          echo "OK: guard refused the mock production build"
 
   backend:
     name: Backend tests (H2 — fast feedback)

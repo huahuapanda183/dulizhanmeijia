@@ -55,6 +55,11 @@ df -h /opt /var /var/backups /var/log 2>/dev/null
 
 say "Toolchain"
 node -v 2>/dev/null || bad "node missing"
+# package.json requires >=24 and .nvmrc says 24, but nothing enforced it:
+# there is no engine-strict, so npm ci only warns. Ubuntu commonly ships 18/20,
+# and the failure then surfaces at RUNTIME in the standalone server, after deploy.
+NODE_MAJOR=$(node -p 'process.versions.node.split(".")[0]' 2>/dev/null || echo 0)
+[ "$NODE_MAJOR" -ge 24 ] || bad "node major is $NODE_MAJOR, need >= 24 (package.json engines)"
 nginx -v 2>&1 || bad "nginx missing"
 java -version 2>&1 || echo "  (JDK 21 not installed yet — an install is a shared-host change; see RUNBOOK step 4)"
 mysqld --version 2>&1 || true
@@ -90,7 +95,11 @@ nginx -T 2>/dev/null | grep -n 'default_server' || true
 echo "-- if none above: parse order decides. We must NOT be the first on any socket:"
 nginx -T 2>/dev/null | grep -nE '^\s*(listen|server_name)' || true
 echo "-- does the existing logrotate cover our log names?"
-grep -n 'var/log/nginx' /etc/logrotate.d/nginx || bad "add deploy/logrotate/lynxiglam-nginx"
+# Our logs are /var/log/nginx/lynxiglam.*.log, so the stock glob already covers
+# them and we ship NO logrotate file of our own (it was deleted — a second entry
+# for the same paths makes logrotate report a duplicate against the *nginx* file
+# and skip its remaining entries, stopping the neighbours' log rotation).
+grep -n 'var/log/nginx' /etc/logrotate.d/nginx   || bad "stock nginx logrotate does not cover /var/log/nginx — our logs would never rotate"
 
 say "Unreplaced credential placeholders (executing these verbatim SUCCEEDS silently)"
 # 001-bootstrap.sql runs fine with the placeholder still in it: MySQL happily

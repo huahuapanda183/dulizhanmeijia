@@ -85,5 +85,27 @@ echo "   OK: api-mode, ${API_URL} inlined, no dev URL present."
 
 chown -R root:root "$REL"
 chmod -R go-w "$REL"
+
+# Everything above is root-owned and go-w stripped, which is what we want for
+# code. But .next must be WRITABLE BY THE SERVICE USER: ReadWritePaths= in the
+# unit only lifts systemd's read-only bind mount — ordinary Unix permissions
+# still apply, and the unit runs as lynxiglam-web with an empty
+# CapabilityBoundingSet (no CAP_DAC_OVERRIDE to fall back on).
+#
+# Without this the ISR writes fail with EACCES instead of EROFS — same silent
+# warn-loop, different errno. Scope it to the two trees Next actually writes:
+# .next/server/app (app-router ISR pages) and .next/cache (fetch cache).
+for d in "$REL/web/.next/server/app" "$REL/web/.next/cache"; do
+  mkdir -p "$d"
+  chown -R lynxiglam-web:lynxiglam-web "$d"
+  chmod -R u+rwX,go-w "$d"
+done
+
+# Static assets must stay READABLE by nginx (www-data). `chmod -R go-w` above
+# removes write bits but never re-adds read, so a build run under a umask of
+# 077 would leave the release mode 0700 and nginx would 403 every asset —
+# the site would render as unstyled HTML with broken images.
+chmod -R a+rX "$REL/web/.next/static" "$REL/web/public"
+
 echo "== Release staged at $REL"
 echo "== Activate: ln -sfn $REL /opt/lynxiglam/current.new && mv -T /opt/lynxiglam/current.new /opt/lynxiglam/current"

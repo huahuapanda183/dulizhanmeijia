@@ -8,6 +8,15 @@ Wants=network-online.target
 # must never cascade into stopping/starting units, and we must never be a
 # reason MySQL gets touched.
 
+# StartLimit* belong to [Unit], not [Service] (systemd moved them in v229).
+# Left in [Service] they are parsed as an unknown key and silently dropped,
+# so the defaults apply: 5 starts per 10s. With RestartSec=5s a crash loop
+# only manages ~2 starts per 10s window, so the limit can NEVER trip and a
+# broken unit flaps forever instead of giving up — filling the shared
+# journald ring and hammering MySQL on every restart.
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
 [Service]
 Type=exec
 Slice=lynxiglam.slice
@@ -47,8 +56,6 @@ RestartSec=5s
 TimeoutStopSec=30s
 KillSignal=SIGTERM
 SuccessExitStatus=143
-StartLimitIntervalSec=300
-StartLimitBurst=10
 
 # --- Resource caps (the documented hard constraints, ENFORCED not asserted) ---
 MemoryAccounting=yes

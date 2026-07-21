@@ -5,6 +5,15 @@ Documentation=file:///opt/lynxiglam/RUNBOOK.md
 After=network-online.target lynxiglam-api.service nginx.service
 Wants=network-online.target
 
+# StartLimit* belong to [Unit], not [Service] (systemd moved them in v229).
+# Left in [Service] they are parsed as an unknown key and silently dropped,
+# so the defaults apply: 5 starts per 10s. With RestartSec=5s a crash loop
+# only manages ~2 starts per 10s window, so the limit can NEVER trip and a
+# broken unit flaps forever instead of giving up — filling the shared
+# journald ring and hammering MySQL on every restart.
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
 [Service]
 Type=exec
 Slice=lynxiglam.slice
@@ -27,8 +36,6 @@ Restart=always
 RestartSec=5s
 TimeoutStopSec=20s
 KillSignal=SIGTERM
-StartLimitIntervalSec=300
-StartLimitBurst=10
 
 MemoryAccounting=yes
 MemoryHigh=448M
@@ -66,9 +73,20 @@ SystemCallErrorNumber=EPERM
 RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX AF_NETLINK
 MemoryDenyWriteExecute=no
 
-# Next writes its fetch/ISR cache here. ProtectSystem=strict makes everything
-# else read-only. Path MUST exist before start (the deploy script mkdir -p's it).
-ReadWritePaths=/opt/lynxiglam/current/web/.next/cache
+# Next needs .next writable, not just .next/cache. Only the FETCH cache lives
+# under .next/cache; app-router ISR pages go to .next/server/app —
+# file-system-cache.js maps APP_PAGE/APP_ROUTE to path.join(serverDistDir,
+# 'app', pathname), and serverDistDir is .next/server.
+#
+# With only .next/cache whitelisted, ProtectSystem=strict kept .next/server
+# read-only, so all 21 `revalidate = 300` routes (/pages/* x15, /blogs/news +
+# 5 posts, /pages/reviews) re-rendered every 5 minutes and then failed to
+# persist with EROFS. Next swallows that and only console.warn()s, so nothing
+# 500s — it just writes one warning per route per 5 minutes into the SHARED
+# journald ring forever (pushing out the neighbours' history), serves from the
+# in-process memory cache (up to 50MB of the 512MB budget), and snaps back to
+# build-time HTML on every restart.
+ReadWritePaths=/opt/lynxiglam/current/web/.next
 
 # SSR resolves lynxiglam.kejing.online -> 127.0.0.1 via /etc/hosts (RUNBOOK
 # step 14), so loopback is all it ever needs. If you skip the /etc/hosts entry,

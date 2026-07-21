@@ -107,7 +107,16 @@ echo "  ^ a 429 body must be JSON, not HTML (src/lib/api/config.ts parses it)."
 echo "=== 10. Security headers ==="
 curl -sI -m 10 https://lynxiglam.kejing.online/ | grep -iE 'strict-transport|content-security|x-frame|x-content-type|referrer-policy|permissions-policy|x-powered-by'
 echo "  ^ X-Powered-By must be ABSENT (next.config.ts leaves poweredByHeader:true)."
-curl -sI -m 10 https://lynxiglam.kejing.online/images/ | grep -ic 'strict-transport'
+# The old check curled /images/ (a DIRECTORY — always 403/404) and grepped for
+# an HSTS header. Every header in the snippet carries `always`, so it is emitted
+# on error responses too: the check returned 1 whether assets served or 404'd.
+# It proved the header, never the asset. That matters because both alias
+# locations combine `alias` with `try_files` — a classic nginx sharp edge whose
+# failure mode is "every image and every JS/CSS chunk 404s", i.e. the site
+# renders as unstyled HTML. Assert real files.
+chk "GET /images/ (asset, 200)" "200" "$(curl -s -o /dev/null -w '%{http_code}' -m 10 https://lynxiglam.kejing.online/images/LaPerle_1.webp)"
+chk "GET /_next/image is 404"   "404" "$(curl -s -o /dev/null -w '%{http_code}' -m 10 'https://lynxiglam.kejing.online/_next/image?url=%2Fimages%2FLaPerle_1.webp&w=3840&q=75')"
+curl -sI -m 10 https://lynxiglam.kejing.online/images/LaPerle_1.webp | grep -ic 'strict-transport'
 echo "  ^ must be 1: proves the header snippet was re-included in the alias"
 echo "    locations. nginx add_header does not merge — a location with its own"
 echo "    add_header silently drops all inherited ones."
