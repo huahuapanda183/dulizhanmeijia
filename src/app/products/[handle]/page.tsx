@@ -90,7 +90,8 @@ export default async function ProductPage({ params }: Params) {
                 <span className="inline-flex items-center rounded-[4px] bg-[#5a31f4] px-1.5 py-0.5 align-middle text-[12px] font-semibold text-white">
                   shop<span className="font-normal">Pay</span>
                 </span>{" "}
-                <a href="#" className="underline"><T k="Learn more" /></a>
+                {/* No "Learn more" link: Shop Pay isn't integrated, and the
+                    href="#" here only looked like one. */}
               </p>
 
               <div className="mt-8 grid grid-cols-4 gap-4 border-y border-line py-6">

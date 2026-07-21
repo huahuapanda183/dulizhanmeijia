@@ -105,11 +105,14 @@ export const FOOTER_COLUMNS: FooterColumn[] = [
   {
     title: "Social",
     links: [
-      { label: "Instagram", href: "https://instagram.com/glamnetic" },
-      { label: "TikTok", href: "https://tiktok.com/@glamnetic" },
-      { label: "Facebook", href: "https://facebook.com/glamnetic" },
-      { label: "X", href: "https://x.com/glamnetic" },
-      { label: "Youtube", href: "https://youtube.com/@glamnetic" },
+      // No href: LynxiGlam has no social accounts yet. These used to point at
+      // Glamnetic's real profiles, so clicking "TikTok" in our footer handed the
+      // visitor to another brand. Add the URL here once an account exists.
+      { label: "Instagram" },
+      { label: "TikTok" },
+      { label: "Facebook" },
+      { label: "X" },
+      { label: "Youtube" },
     ],
   },
   {

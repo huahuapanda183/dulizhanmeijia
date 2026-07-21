@@ -149,3 +149,27 @@ jobs:
           test "$BAD" -eq 0 || { echo "failed migrations present"; exit 1; }
           ZERO=$(mysql -h 127.0.0.1 -uroot -pci lynxiglam -N -e "SELECT COUNT(*) FROM products WHERE created_at IS NULL OR YEAR(created_at) < 2000;")
           test "$ZERO" -eq 0 || { echo "datetime literals were silently zeroed"; exit 1; }
+
+      # V3/V4 repair data seeded by V2. The MockMvc suites load V1+V2 only, so this
+      # job is the ONLY place they are ever executed. Assert their effects, not just
+      # that Flyway reported success.
+      - name: Verify the repair migrations actually repaired something
+        run: |
+          STALE=$(mysql -h 127.0.0.1 -uroot -pci lynxiglam -N -e "
+            SELECT COUNT(*) FROM reviews r JOIN products p ON p.handle = r.product_handle
+            WHERE r.product_title <> p.title;")
+          test "$STALE" -eq 0 || { echo "V3 left $STALE reviews naming the wrong product"; exit 1; }
+
+          BRAND=$(mysql -h 127.0.0.1 -uroot -pci lynxiglam -N -e "
+            SELECT (SELECT COUNT(*) FROM page_section_body WHERE paragraph LIKE '%glamnetic%')
+                 + (SELECT COUNT(*) FROM collections WHERE handle LIKE '%glamnetic%')
+                 + (SELECT COUNT(*) FROM product_collections WHERE collection_handle LIKE '%glamnetic%');")
+          test "$BRAND" -eq 0 || { echo "V4 left $BRAND rows carrying the cloned brand"; exit 1; }
+
+          # V4 juggles a UNIQUE position column while swapping the collection row.
+          ORPHAN=$(mysql -h 127.0.0.1 -uroot -pci lynxiglam -N -e "
+            SELECT COUNT(*) FROM product_collections pc
+            LEFT JOIN collections c ON c.handle = pc.collection_handle WHERE c.handle IS NULL;")
+          test "$ORPHAN" -eq 0 || { echo "V4 orphaned $ORPHAN product_collections rows"; exit 1; }
+          mysql -h 127.0.0.1 -uroot -pci lynxiglam -e "
+            SELECT handle, position FROM collections ORDER BY position LIMIT 3;"

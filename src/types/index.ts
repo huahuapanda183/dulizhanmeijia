@@ -63,7 +63,14 @@ export interface Logo {
 
 export interface FooterLink {
   label: string;
-  href: string;
+  /**
+   * Omit for a destination LynxiGlam does not own yet. The footer then renders
+   * the label as plain text instead of a link. Deliberately optional rather
+   * than `href: "#"`: a `#` still looks and behaves like a link, and these
+   * entries previously pointed at Glamnetic's real social accounts, sending
+   * our visitors to another brand.
+   */
+  href?: string;
 }
 
 export interface FooterColumn {

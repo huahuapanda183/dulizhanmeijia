@@ -150,7 +150,7 @@ export const PAGES: Page[] = [
       {
         heading: "Where To Buy",
         body: [
-          "Beyond glamnetic.com, you can shop select LynxiGlam favorites at major beauty retailers nationwide, including Ulta Beauty, Sephora, and Ulta Beauty at Target.",
+          "Beyond lynxiglam.com, you can shop select LynxiGlam favorites at major beauty retailers nationwide, including Ulta Beauty, Sephora, and Ulta Beauty at Target.",
           "Availability varies by location and season, so we recommend calling ahead to confirm your favorite style is in stock.",
         ],
       },
@@ -363,7 +363,7 @@ export const PAGES: Page[] = [
       {
         heading: "Agreement To Terms",
         body: [
-          "By accessing or purchasing from glamnetic.com, you agree to these Terms of Service and all policies referenced within them. If you do not agree, please do not use the site.",
+          "By accessing or purchasing from lynxiglam.com, you agree to these Terms of Service and all policies referenced within them. If you do not agree, please do not use the site.",
           "We may update these terms from time to time. Continued use of the site after changes are posted constitutes your acceptance of the revised terms.",
         ],
       },

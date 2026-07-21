@@ -30,32 +30,25 @@ export function SiteFooter() {
             <ul>
               {col.links.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="block py-1.5 text-[14px] text-body hover:text-ink">
-                    <T k={link.label} />
-                  </Link>
+                  {link.href ? (
+                    <Link href={link.href} className="block py-1.5 text-[14px] text-body hover:text-ink">
+                      <T k={link.label} />
+                    </Link>
+                  ) : (
+                    // Destination we don't own yet — show the label, but don't
+                    // dress it as something clickable.
+                    <span className="block py-1.5 text-[14px] text-body/60">
+                      <T k={link.label} />
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
 
-            {col.title === "Social" && (
-              <>
-                <h4 className="mb-3 mt-8 text-[15px] text-ink"><T k="Download Our App" /></h4>
-                <div className="flex gap-3">
-                  <a href="#" className="flex items-center gap-2 rounded-md bg-black px-3 py-2 text-white">
-                    <span className="flex flex-col leading-none">
-                      <span className="text-[8px]">Download on the</span>
-                      <span className="text-[13px] font-semibold">App Store</span>
-                    </span>
-                  </a>
-                  <a href="#" className="flex items-center gap-2 rounded-md bg-black px-3 py-2 text-white">
-                    <span className="flex flex-col leading-none">
-                      <span className="text-[8px]">GET IT ON</span>
-                      <span className="text-[13px] font-semibold">Google Play</span>
-                    </span>
-                  </a>
-                </div>
-              </>
-            )}
+            {/* The "Download Our App" App Store / Google Play buttons that sat
+                here were inherited from the clone and pointed at "#". There is no
+                LynxiGlam app, so they advertised a product that doesn't exist.
+                Restore them alongside real store URLs if an app ships. */}
           </div>
         ))}
       </div>

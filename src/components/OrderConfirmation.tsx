@@ -7,7 +7,7 @@ import { formatPrice } from "@/lib/format";
 import { useI18n } from "@/lib/i18n/i18n-context";
 import type { Order } from "@/lib/data/types";
 
-const LAST_ORDER_KEY = "glamnetic-last-order";
+const LAST_ORDER_KEY = "lynxiglam-last-order";
 
 export function OrderConfirmation() {
   const { t } = useI18n();

@@ -84,12 +84,9 @@ export async function ProductReviews({ handle }: { handle: string }) {
           </div>
         )}
 
-        <a
-          href="#"
-          className="mt-8 mx-auto block w-fit border border-ink text-ink uppercase tracking-[0.12em] text-[13px] px-8 py-3 rounded-sm hover:bg-ink hover:text-white transition-colors"
-        >
-          <T k="Write a Review" />
-        </a>
+        {/* The "Write a Review" button pointed at "#" — it looked like a working
+            CTA but there is no review submission flow. Restore it as a real link
+            or dialog once one exists. */}
       </div>
     </section>
   );

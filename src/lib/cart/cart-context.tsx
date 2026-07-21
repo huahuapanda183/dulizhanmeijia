@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CartLine, Product } from "@/lib/data/types";
 
-const STORAGE_KEY = "glamnetic-cart";
+const STORAGE_KEY = "lynxiglam-cart";
 
 interface CartContextValue {
   lines: CartLine[];

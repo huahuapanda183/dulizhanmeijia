@@ -17,7 +17,7 @@ import type { Address, PromoResult, ShippingRate } from "@/lib/data/types";
  * 12.61 while the server bills 12.62.
  */
 const TAX_BASIS_POINTS = 725;
-const LAST_ORDER_KEY = "glamnetic-last-order";
+const LAST_ORDER_KEY = "lynxiglam-last-order";
 
 const toCents = (major: number) => Math.round(major * 100);
 const fromCents = (cents: number) => cents / 100;

@@ -4,7 +4,7 @@ import type { Collection, NavItem } from "./types";
 
 export const COLLECTIONS: Omit<Collection, "products">[] = [
   { handle: "all", title: "Shop All", description: "Every press-on nail set, lash, bundle and accessory.", image: "Shop_Nails.png" },
-  { handle: "shop-all-glamnetic-products", title: "Shop All LynxiGlam Products", description: "The full LynxiGlam lineup — nails, lashes, liners and accessories.", image: "Shop_Nails.png" },
+  { handle: "shop-all-lynxiglam-products", title: "Shop All LynxiGlam Products", description: "The full LynxiGlam lineup — nails, lashes, liners and accessories.", image: "Shop_Nails.png" },
   { handle: "all-nails", title: "Glue-On Nails", description: "Reusable press-on nails in every shape and style.", image: "Shop_Nails.png" },
   { handle: "press-on-nails", title: "Press-On Nails", description: "Salon-quality press-on nails.", image: "Shop_Nails.png" },
   { handle: "best-sellers", title: "Best Sellers", description: "Our most-loved sets.", image: "CitrusCoast_1.webp" },

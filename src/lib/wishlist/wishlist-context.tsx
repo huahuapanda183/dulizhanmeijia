@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { WishlistItem } from "@/lib/data/types";
 
-const STORAGE_KEY = "glamnetic-wishlist";
+const STORAGE_KEY = "lynxiglam-wishlist";
 
 interface WishlistContextValue {
   items: WishlistItem[];
