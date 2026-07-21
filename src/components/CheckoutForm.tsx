@@ -388,23 +388,28 @@ export function CheckoutForm() {
               </div>
             </section>
 
+            {/*
+              The card number / expiry / CVC inputs that stood here are gone.
+              They looked exactly like a working payment form but had no state,
+              no name, and were never submitted — and none of them set
+              autoComplete="off", so browsers and password managers offered to
+              fill and save a REAL card. A visitor could type real card details
+              into a page that cannot charge them, press "Place Order", get a
+              persisted order plus a confirmation screen, and then never receive
+              anything: no payment is taken, so no refund is even possible.
+              Rendering card fields at all also drags this site into PCI DSS
+              scope, which SAQ A avoids precisely by keeping card data out of
+              the merchant's own DOM.
+
+              To reinstate payment, integrate a provider whose fields live in
+              their iframe (Stripe Elements / Checkout) — do not re-add raw
+              inputs here.
+            */}
             <section className="mt-10">
               <h2 className="text-[18px] font-medium text-ink">{t("Payment")}</h2>
-              <p className="mt-2 text-[13px] text-body">{t("Demo checkout — no real payment is processed.")}</p>
-              <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div className="sm:col-span-2">
-                  <label htmlFor="card" className="mb-1.5 block text-[13px] text-body">{t("Card number")}</label>
-                  <input id="card" inputMode="numeric" placeholder="4242 4242 4242 4242" className={inputClass} />
-                </div>
-                <div>
-                  <label htmlFor="expiry" className="mb-1.5 block text-[13px] text-body">{t("Expiry")}</label>
-                  <input id="expiry" placeholder="MM / YY" className={inputClass} />
-                </div>
-                <div>
-                  <label htmlFor="cvc" className="mb-1.5 block text-[13px] text-body">{t("CVC")}</label>
-                  <input id="cvc" inputMode="numeric" placeholder="123" className={inputClass} />
-                </div>
-              </div>
+              <p className="mt-2 text-[13px] text-body">
+                {t("Payment isn't connected yet, so no card is charged and nothing ships.")}
+              </p>
             </section>
 
             {error && <p className="mt-6 text-[14px] text-red-600" role="alert">{error}</p>}

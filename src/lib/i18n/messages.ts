@@ -285,8 +285,6 @@ export const zh: Record<string, string> = {
   "Phone (optional)": "电话（选填）",
   "Shipping method": "配送方式",
   Payment: "支付",
-  "Demo checkout — no real payment is processed.": "演示结算——不会真实扣款。",
-  "Card number": "卡号",
   Expiry: "有效期",
   CVC: "安全码",
   "Place Order": "提交订单",
@@ -371,6 +369,7 @@ export const zh: Record<string, string> = {
   "Customers can already register and sign in — there is just no admin list to read them with yet.": "客户已经可以注册和登录，只是后台还没有做查看列表。",
   "Query the orders table directly until this page is wired to a read endpoint.": "在本页接入查询接口之前，请直接查 orders 表。",
   "Query the customers table directly until this page is wired to a read endpoint.": "在本页接入查询接口之前，请直接查 customers 表。",
+  "Payment isn't connected yet, so no card is charged and nothing ships.": "尚未接入支付，因此不会产生任何扣款，也不会发货。",
 };
 
 export function translate(locale: Locale, key: string): string {

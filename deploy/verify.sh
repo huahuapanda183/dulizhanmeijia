@@ -19,11 +19,26 @@ systemctl show -p CPUQuotaPerSecUSec -p TasksMax -p MemorySwapMax lynxiglam-api.
 
 echo "=== 2. Memory caps ENFORCED (cgroup v2 — the kernel's own truth) ==="
 # This is the authoritative one: systemd can report a value it failed to apply.
-chk "api cgroup memory.max" "1073741824" "$(cat /sys/fs/cgroup/system.slice/lynxiglam-api.service/memory.max 2>/dev/null)"
-chk "web cgroup memory.max" "536870912"  "$(cat /sys/fs/cgroup/system.slice/lynxiglam-web.service/memory.max 2>/dev/null)"
+#
+# Resolve the cgroup path from systemd instead of hardcoding it. Both units set
+# Slice=lynxiglam.slice, so they live under /sys/fs/cgroup/lynxiglam.slice/,
+# NOT system.slice/. The old hardcoded system.slice path never existed: `cat`
+# failed, 2>/dev/null swallowed it, and this check — the ONLY kernel-level
+# evidence behind "we cannot OOM the neighbours" — reported FAIL every single
+# run. A check that always fails trains the operator to ignore the whole
+# script, including section 7 (neighbour DB reachable), which is the one that
+# actually matters.
+cg() { echo "/sys/fs/cgroup$(systemctl show -p ControlGroup --value "$1" 2>/dev/null)"; }
+API_CG=$(cg lynxiglam-api.service); WEB_CG=$(cg lynxiglam-web.service)
+echo "  api cgroup: $API_CG"
+echo "  web cgroup: $WEB_CG"
+chk "api cgroup memory.max" "1073741824" "$(cat "$API_CG/memory.max" 2>/dev/null)"
+chk "web cgroup memory.max" "536870912"  "$(cat "$WEB_CG/memory.max" 2>/dev/null)"
 echo "  current usage:"
-echo "    api $(( $(cat /sys/fs/cgroup/system.slice/lynxiglam-api.service/memory.current 2>/dev/null || echo 0) / 1048576 )) MiB / 1024"
-echo "    web $(( $(cat /sys/fs/cgroup/system.slice/lynxiglam-web.service/memory.current 2>/dev/null || echo 0) / 1048576 )) MiB / 512"
+echo "    api $(( $(cat "$API_CG/memory.current" 2>/dev/null || echo 0) / 1048576 )) MiB / 1024"
+echo "    web $(( $(cat "$WEB_CG/memory.current" 2>/dev/null || echo 0) / 1048576 )) MiB / 512"
+echo "  OOM counters (must stay 0 — a non-zero 'oom_kill' means we hit the cap):"
+grep -E '^(oom|oom_kill) ' "$API_CG/memory.events" 2>/dev/null | sed 's/^/    api /' || echo "    api memory.events unreadable"
 
 echo "=== 3. -Xmx512m actually passed, and the JVM actually took it ==="
 API_PID=$(systemctl show -p MainPID --value lynxiglam-api.service)

@@ -61,8 +61,19 @@ A "build first, then deploy" order simply does not work here.
 > data assertions below all produced the expected output there, so what follows is
 > tested, not theoretical. Two gotchas it surfaced are noted inline.
 
-6. 🔴 **MySQL bootstrap** — `sudo mysql --user=root -p < deploy/mysql/001-bootstrap.sql`
-   (after replacing both password placeholders with `openssl rand -base64 32`).
+6. 🔴 **MySQL bootstrap.** Generate both passwords, then pass them as session
+   variables — the SQL no longer contains any password literal, and it aborts if
+   either variable is unset (`PREPARE` on a NULL string fails). Keep the leading
+   space so the passwords stay out of shell history:
+   ```
+    APP_PW=$(openssl rand -base64 32); BK_PW=$(openssl rand -base64 32)
+    sudo mysql --user=root -p \
+      --init-command="SET @lg_app_pw='$APP_PW', @lg_backup_pw='$BK_PW'" \
+      < deploy/mysql/001-bootstrap.sql
+   ```
+   Put `$APP_PW` into `/etc/lynxiglam/lynxiglam.env` and `$BK_PW` into the backup
+   cnf (both root:root 0600) **now**, before you lose the shell — they are not
+   recoverable afterwards. Then `unset APP_PW BK_PW`.
    Creates the `lynxiglam` DB + two least-privilege users, **and applies
    `MAX_USER_CONNECTIONS 10`** — the only connection cap the DB itself enforces.
    **Immediately prove isolation (do not defer this):**
@@ -102,7 +113,8 @@ A "build first, then deploy" order simply does not work here.
    **Prove the caps before continuing:**
    ```
    systemctl show -p MemoryMax --value lynxiglam-api.service     # 1073741824
-   cat /sys/fs/cgroup/system.slice/lynxiglam-api.service/memory.max   # 1073741824
+   # Units set Slice=lynxiglam.slice, so they are NOT under system.slice/.
+   cat "/sys/fs/cgroup$(systemctl show -p ControlGroup --value lynxiglam-api.service)/memory.max"   # 1073741824
    ps -o args= -p $(systemctl show -p MainPID --value lynxiglam-api) | tr ' ' '\n' | grep Xmx
    ss -lntp | grep 8090                                          # 127.0.0.1:8090, NOT 0.0.0.0
    journalctl -u lynxiglam-api -b | grep -i 'profile'            # "1 profile is active: prod"
@@ -227,7 +239,7 @@ A "build first, then deploy" order simply does not work here.
 21. ⚪ **Watch for 24h**: `systemctl status lynxiglam-api lynxiglam-web`,
     `journalctl -u lynxiglam-api -f`, and:
     ```
-    cat /sys/fs/cgroup/system.slice/lynxiglam-api.service/memory.events
+    cat "/sys/fs/cgroup$(systemctl show -p ControlGroup --value lynxiglam-api.service)/memory.events"
     ```
     A rising `max`/`oom` counter means the 1 G cap is genuinely binding and the
     JVM needs tuning — **do not "fix" it by raising MemoryMax**; that spends the

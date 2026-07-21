@@ -43,9 +43,22 @@ CREATE DATABASE IF NOT EXISTS `lynxiglam`
 -- It must ALSO go into /etc/lynxiglam/lynxiglam.env (root:root 0600) and
 -- NOWHERE ELSE. Do not paste it into a chat, a commit, or a shell history line
 -- (prefix the mysql invocation with a space if HISTCONTROL=ignorespace).
-CREATE USER IF NOT EXISTS 'lynxiglam'@'127.0.0.1'
-    IDENTIFIED BY 'REPLACE_ME_WITH_A_GENERATED_PASSWORD'
-    WITH MAX_USER_CONNECTIONS 10;   -- 8 Hikari + 1 Flyway + 1 headroom
+-- Passwords come from session variables, never from a literal in this file.
+-- Invoke as (note the leading space to keep it out of shell history):
+--    mysql -u root -p --      --init-command="SET @lg_app_pw='...', @lg_backup_pw='...'" < 001-bootstrap.sql
+--
+-- If either variable is unset, CONCAT() below yields NULL and PREPARE fails
+-- with "Incorrect arguments to EXECUTE", aborting the script. That matters:
+-- the previous version had the placeholder as a LITERAL, so running it without
+-- editing SUCCEEDED SILENTLY and created an account whose password is published
+-- in a public git repo. Locked to @'127.0.0.1' it stops no external attacker,
+-- but podsys and kejing run ON this host and can reach 127.0.0.1:3306 — any
+-- neighbour process could then read or wipe our orders and customers. That is
+-- tenant isolation inverted, which is exactly what this file exists to prevent.
+SET @sql = CONCAT("CREATE USER IF NOT EXISTS 'lynxiglam'@'127.0.0.1' IDENTIFIED BY '",
+                  @lg_app_pw, "' WITH MAX_USER_CONNECTIONS 10");
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = NULL;
 
 -- Re-assert the cap even if the user pre-existed (CREATE ... IF NOT EXISTS
 -- silently skips the WITH clause on an existing account).
@@ -71,9 +84,10 @@ GRANT CREATE, DROP, ALTER, INDEX, REFERENCES, CREATE TEMPORARY TABLES
 -- --- 3. Backup user (read-only, separate identity) --------------------
 -- Split from the app user so a compromised app process cannot read the backup
 -- credential, and so backup access is independently revocable.
-CREATE USER IF NOT EXISTS 'lynxiglam_backup'@'127.0.0.1'
-    IDENTIFIED BY 'REPLACE_ME_WITH_A_DIFFERENT_GENERATED_PASSWORD'
-    WITH MAX_USER_CONNECTIONS 2;
+SET @sql = CONCAT("CREATE USER IF NOT EXISTS 'lynxiglam_backup'@'127.0.0.1' IDENTIFIED BY '",
+                  @lg_backup_pw, "' WITH MAX_USER_CONNECTIONS 2");
+PREPARE stmt FROM @sql; EXECUTE stmt; DEALLOCATE PREPARE stmt;
+SET @sql = NULL;
 ALTER USER 'lynxiglam_backup'@'127.0.0.1' WITH MAX_USER_CONNECTIONS 2;
 
 GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES
@@ -88,7 +102,10 @@ GRANT SELECT, SHOW VIEW, TRIGGER, LOCK TABLES
 -- exact minor version first:  mysqld --version
 -- Under no circumstances "fix" a dump failure with GRANT RELOAD ON *.*.
 
-FLUSH PRIVILEGES;
+-- (No FLUSH PRIVILEGES: CREATE USER/GRANT/ALTER USER already update the
+--  in-memory grant tables. FLUSH takes a GLOBAL ACL lock that briefly stalls
+--  authentication for EVERY tenant on this instance — a global side effect in
+--  a file whose whole premise is 'never global'.)
 
 -- --- 4. Verification (run these; do not assume) -----------------------
 -- SHOW GRANTS FOR 'lynxiglam'@'127.0.0.1';

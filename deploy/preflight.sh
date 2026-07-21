@@ -64,14 +64,45 @@ echo "    --single-transaction privilege requirement (see backup script)."
 say "nginx structure (do not proceed if either answer is wrong)"
 grep -n 'include /etc/nginx/conf.d' /etc/nginx/nginx.conf || bad "conf.d not included — the rate-limit zones would never load"
 grep -n 'include /etc/nginx/sites-enabled' /etc/nginx/nginx.conf || bad "sites-enabled not included"
-echo "-- existing global names (a collision with ours = TOTAL nginx outage on reload):"
+echo "-- existing global NAMES (a collision with ours = TOTAL nginx outage on reload):"
 nginx -T 2>/dev/null | grep -E '^\s*(upstream|limit_req_zone|limit_conn_zone|geo|map)\b' || true
 echo "-- any lg_-prefixed name already present? (expect none)"
 nginx -T 2>/dev/null | grep -c 'lg_' || true
+
+# The named-object grep above only catches lg_ collisions, which the prefix
+# already makes impossible. The directives that actually collided on this host
+# are SCALARS — podsys-ratelimit.conf sets `limit_req_status 429;` at http
+# context, and a second one anywhere in http context is
+# [emerg] "..." directive is duplicate -> nginx -t fails for the WHOLE box.
+# They now live in our server block, so this is a regression gate: if any of
+# them ever reappears in conf.d, this must fail before the file is installed.
+echo "-- http-context SCALARS that would duplicate (ours must be in server context):"
+nginx -T 2>/dev/null | grep -nE '^\s*(limit_req_status|limit_conn_status|limit_req_log_level|ssl_session_cache|ssl_session_timeout|ssl_session_tickets)\b' || true
+for d in limit_req_status limit_conn_status limit_req_log_level ssl_session_cache ssl_session_timeout ssl_session_tickets; do
+  grep -qE "^\s*${d}\b" "$(dirname "$0")/nginx/lynxiglam-shared.conf" 2>/dev/null &&
+    bad "$d is back in lynxiglam-shared.conf (http context) — move it to the server block"
+done
+
 echo "-- who owns default_server? (must NOT become us)"
 nginx -T 2>/dev/null | grep -n 'default_server' || true
+# No default_server anywhere means the FIRST server block per socket wins by
+# parse order. Print the ordering so the operator can confirm we are not first.
+echo "-- if none above: parse order decides. We must NOT be the first on any socket:"
+nginx -T 2>/dev/null | grep -nE '^\s*(listen|server_name)' || true
 echo "-- does the existing logrotate cover our log names?"
 grep -n 'var/log/nginx' /etc/logrotate.d/nginx || bad "add deploy/logrotate/lynxiglam-nginx"
+
+say "Unreplaced credential placeholders (executing these verbatim SUCCEEDS silently)"
+# 001-bootstrap.sql runs fine with the placeholder still in it: MySQL happily
+# creates an account whose password is a string published in a public git repo.
+# The account is locked to @'127.0.0.1' with only lynxiglam.* rights, so no
+# external attacker gets in — but podsys and kejing run ON this host and can
+# reach 127.0.0.1:3306, so any neighbour process could read or wipe our orders
+# and customers. That inverts the tenant isolation this whole file exists for.
+HERE="$(dirname "$0")"
+if grep -rn 'REPLACE_ME' "$HERE/mysql/" "$HERE"/*.env.example "$HERE/backup/" 2>/dev/null; then
+  bad "placeholders above are still present — replace them BEFORE running any of these"
+else ok "no REPLACE_ME placeholders left"; fi
 
 say "Neighbour baseline — capture NOW, compare after every step"
 for h in pod.kejing.online kejing.online www.kejing.online kejing.site kejing.duckdns.org; do
